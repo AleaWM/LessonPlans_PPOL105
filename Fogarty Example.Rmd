@@ -1,0 +1,308 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Recoding most of our variables:
+```{r}
+ANES = within(ANES,
+                  {
+                    pid3 <-
+                      recode(as.numeric(V161158x),
+                             "1:3 = 'Democrat';
+                             4 = 'Independent';
+                             5:7 = 'Republican'",
+                             as.factor=TRUE)
+                   
+                     partyscale <-
+                        ifelse(V161158x<1, NA, V161158x)
+                    
+                    gender <-
+                      recode(as.numeric(V161342), 
+                             "1 = 'Male'; 2 = 'Female'; else=NA")
+                    
+                    agecat <-   
+                      recode(as.numeric(V161267),
+                                   "17:29 = '18-29';
+                                    30:44 = '30-44';
+                                    45:65 = '45-65';
+                                    64:120 = '65+';
+                                    else=NA", as.factor=TRUE)
+                     
+                    agecont <-   ifelse(V161267<1, NA, V161267)
+                                  
+                    race <- recode(as.numeric(V161310x),
+                                   "1 = 'White';
+                                   2 = 'Black';
+                                   5 = 'Hisp';
+                                   3:4 = 'Other/Multiple races';
+                                   6='Other/Multiple races'")
+                    ideol <-
+                      ifelse(V161126 <1, NA, V161126)
+                       
+                    bachelors <- recode(as.numeric(V161270), 
+                                      "1:12 = 'Not BA';
+                                      13:16 = 'BA';
+                                      else=NA")
+                    educat <- 
+                      recode(as.numeric(V161270),
+                       "1:8 ='Some HS';
+                        9 = 'HS Grad';
+                        10:12 = 'Some College';
+                        13 = 'BA';
+                        14 = 'Master';
+                        15 = 'MD,DDS, etc.';
+                        16 = 'PhD';
+                        else=NA") 
+                    
+                    educont <-
+                      ifelse(V161270>16, NA, V161270)
+
+                    income <- ifelse(V161361x <1, NA, V161361x)
+                      })
+```
+pid3: Democrats=1, Independents=2, Republicans=3, categorical
+partyscale:  7 point scale from 1=strong democrat to 7=strong republican; ordinal
+gender: Male and female; dichotomous
+agecat: Age broken up into 4 groups; categorical
+agecont: Age with coding from code book; continuous
+race:
+ideol: 7 point scale where 1=extremely liberal and 7=extremely conservative; ordinal
+bachelors: Education variable for having 4 years of college or more; dichotomous (either 1=yes bachelors or 0=no bachelors degree)
+educont: Education with a range of 1 to 16 as it was in the code book; ordinal
+educat:Education with 7 categories; ordinal
+income: kept coding used in code book; ordinal
+
+
+# Last Week: Bivariate Regression
+Last week in the bivariate regression lab, one of the last models asked if people's feelings towards scientists depended on their registered political party.
+  
+Null Hypothesis: There is not relationship between opinions on scientists and political party
+Alternative Hypothesis: The more republican one is, the more less positively they view scientists.
+DV: Feeling thermometer of scientists
+IV: political party (categorical with 3 options: democrat, republican, independent)
+```{r}
+# test whether people's perception of scientists depend on party registration  
+ANES$party <- factor(ANES$V161019,
+                   levels = c(1, 2, 4), 
+                   labels = c("Democrats", "Republicans", "Independents"))
+ANES$scientists <- ANES$V162112
+scientistsbyparty <- lm(scientists ~ party, data=ANES)
+summary(scientistsbyparty)
+
+```
+Democrats were automatically made the comparison group. 
+
+- Intercept = 81.24
+- The average feeling towards scientists for democrats is 81.24 out of 100. 
+Coefficient for Republicans: -7.24
+- The average feeling towards scientists for republicans is 7.24 less than the average feeling of democrats. Therefore, republicans score an average of 74.0 out of 100 on a feeling thermometer for scientists. This relationship is significant (p <0.01)
+Coefficient for Independents: -2.34
+- The average feeling towards scientists for independents is -2.34 less than democrats. Therefore, independents score an average of 78.9 out of 100 on a feeling thermometer for scientists.This relationship is significant if using a 95% confidence interval, but not significant if using a 99% confidence interval (p=0.041).
+R Squared: The model explains 2.8% of the variation of people's feelings towards scientists. 
+
+### Out of curiosity, what happens if we use political party as a scale from Strong Democrat to Strong Republican instead of as a categorical variable? 
+
+```{r}
+scipartyscalecor <- cor.test(ANES$scientists, ANES$partyscale)
+scipartyscalecor 
+```
+Based on the output, there is a weak negative correlation between opinions toward scientists and political party. As one becomes more republican, their view of scientists decreases. r= -0.200, p< 0.001
+
+Let's put it in a model and look at it.
+```{r}
+scipartyscale <- lm(ANES$scientists~ANES$partyscale)
+summary(scipartyscale)
+```
+Null Hypothesis: There is not a relationship between views of scientists and political party.
+Alternative Hypothesis: The more republican one is, the less positively they view scientists.
+DV: Feeling thermometer of scientists
+IV: political party ( 7pt scale from strong democrat -> strong republican)
+
+The DV is still views of scientists and the IV is still political party, but now it is an ordinal variable instead of categorical. 
+Intercept = 83.65: The predicted feelings towards scientists when the IV=0; y=83.65 - 1.81*0
+PartyScale Coefficient: There is a negative and significant effect of political party on feelings towards scientists. For every additions unit of "republican-ness", the predicted feelings decrease by 1.8. Someone who identified as a strong republican is predicted to have an average feeling score of 83.65-1.81*7 = 70.98. 
+
+In the last model, Republicans had an average score of ~74 and in this model, Republicans had an average score of ~71. It's close. Depending on your research question one may be more valid than the other.
+
+
+
+Okay cool....  but what about all the other variance that is not explained by the model? What if political party alone does not influence views of scientists?  
+
+
+# This Week: Multivariate Regression: Adding Another independent variable
+
+Types of correlation used to describe the relationship between two variables from a regression model with multiple IVs:
+
+- Partial correlation – the strength and direction of the association between two variables after removing the influence of one or more other variables from both variables in the correlation (x and y)
+  - How much of the variance not explained by other variables is explained by this predictor?
+  - Part (semi-partial) correlation is the strength and direction of the association between two variables after removing the influence of one or more other variables from only the independent variable
+  - Represents the unique contribution or impact of a given independent variable controlling for the effects of other variables
+  - How much of the total variance in the dependent variable is uniquely explained by the predictor?
+
+- Assumptions Reminder: Linearity assumes a straight line relationship between each of the two variables and homoscedasticity assumes that data is equally distributed about the regression line.
+- Predictor variables can be ANY level of measurement - nominal, ordinal, interval, or ratio.
+R-squared tells us the amount of variance that is explained in the outcome variable by the predictor variables: Our model explains X% of the variance in our outcome variable. 
+
+The more variables you add, R-squared will keep increasing because the 
+
+Adjusted R-Squared matters now. It "punishes" you for adding tons of predictor variables.
+
+The model itself has a p-value and F statistics. If the model is statistically significant, then the model is better than  a model with no predictor variables. That's pretty easy to do.  
+
+General Syntax:
+model <- lm(DV~ IV+ IV + IV, data=df) 
+summary(model)
+
+Let's add education to our model...
+
+Potential research question: Does political party predict views towards scientists when education is held constant?
+```{r}
+model2 <- lm(scientists ~ pid3+educont, data=ANES)
+summary(model2)
+```
+Democrats with 0 units of education are predicted to have an average score of 66.6 out of 100 on a feeling thermometer for views of scientists when holding education constant. Independents with 0 education are expected to rate scientists 66.6-6.75= 59.85 on average when holding education constant. Republicans are expected to have an average score of 66.6-8.23= 58.37 when holding education constant. 
+When holding political party constant, it is expected that views of scientists increase 1.28 units for every 1 unit increase in education.
+All variables in the model are statistically significant predictors of views of scientists.
+
+
+```{r}
+model3 <- lm(scientists ~ pid3 + educont + agecont, data=ANES)
+summary(model3)
+```
+Essentially the same as model 2. Age is not a significant predictor of one's views of scientists. 
+```{r}
+model5 <- lm(scientists ~ pid3 + educont + agecont + income + gender, data=ANES)
+summary(model5)
+```
+Our adjusted r-squared increased to 0.678 so that is good.
+
+
+# Another Multivariate Regression Example.
+This example is from the Fogarty book but uses slightly different code. Fogarty coded the variables as factors and did not remove negatives initially. This changes the "level" that is referenced when recoding variables.
+
+```{r}
+ANES$trump <- ANES$V161087
+hist(ANES$trump)
+```
+
+```{r}
+ANES$obcare <- recode(as.numeric(ANES$V161114x), "1='7. Favor a Great Deal'; 2='6. Favor Moderately'; 3='5. Favor a Little'; 4='4. Neither Favor nor Opose'; 5='3. Oppose a Little'; 6='2. Oppose Moderately'; 7='1. Oppose a Great Deal'", as.factor=TRUE)
+ANES$obcarenum <-as.numeric(ANES$obcare)
+table(ANES$obcare)
+```
+
+```{r}
+ANES$econ <- recode(as.numeric(ANES$V161140x), "1='5. Much Better'; 2='4. Somewhat Better'; 3='3. About the Same'; 4='2. Somewhat Worse'; 5='1. Much worse'; else=NA", as.factor=TRUE) 
+ANES$econnum <- as.numeric(ANES$econ)
+table(ANES$econ)
+```
+```{r}
+ANES$wall <- recode(as.numeric(ANES$V161196x), "1='7. Favor a great deal'; 2='6. Favor a moderate amount'; 3='5. Favor a little'; 4='4. Neither Favor nor Opose'; 5='3. Oppose a little'; 6='2. Oppose a moderate amount'; 7='1. Oppose a great deal'", as.factor=TRUE)
+ANES$wallnum <- as.numeric(ANES$wall)
+table(ANES$wall)
+```
+```{r}
+ANES$isis <- recode(as.numeric(ANES$V161213x), "1='7. Favor a great deal'; 2='6. Favor a moderate amount'; 3='5. Favor a little'; 4='4. Neither Favor nor Opose'; 5='3. Oppose a little'; 6='2. Oppose a moderate amount'; 7='1. Oppose a great deal'", as.factor=TRUE)
+ANES$isisnum <- as.numeric(ANES$isis)
+table(ANES$isis)
+```
+
+```{r}
+trumpwall <- subset(ANES, !is.na(trump) & !is.na(wall))
+p1 <- ggplot(data=trumpwall) + 
+  geom_histogram(mapping = aes(trump, fill=wall), binwidth=10)
+p1
+```
+
+
+```{r}
+t.test(trump ~ gender, data=ANES)
+```
+```{r}
+wilcox.test(trump ~ gender, data=ANES)
+```
+```{r}
+wilcox.test(trump ~ gender, alternative="greater", data=ANES)
+
+```
+
+### Model 1
+```{r}
+summary(model.1 <- lm(trump ~ gender + educont + partyscale + ideol, data=ANES))
+```
+```{r}
+confint(model.1, level=.95)
+```
+### Model 2
+```{r}
+summary(model.2 <- lm(trump~gender+educont+partyscale+ideol+obcarenum+econnum+ isisnum, data=ANES))
+confint(model.2, level=.95)
+```
+
+
+
+# Recap and expansions on previous stuff
+
+### General reminders!
+Is your min and max what you want it to be? Check with psych::describe() and get other descriptive statistics (that is just of many, many commands and ways to check this)
+
+### Between Samples T-Test and Between Samples ANOVA
+When you are comparing groups!
+
+In HW 4, we had you compare responses between two groups for a continuous variable. 
+```{r}
+ANES$scientists <- recode(ANES$V162112, "101:1000=NA")
+ANES$demrep <- factor(ANES$V161019,
+                   levels = c(1, 2), 
+                   labels = c("Democrats", "Republicans"))
+t.test(ANES$scientists~ANES$demrep)
+```
+But what if we care about what independents think too? Then we would need to run an between-subjects ANOVA because we want to compare more than two groups. 
+```{r}
+aov1 <- aov(ANES$scientists~ANES$pid3)
+summary(aov1)
+```
+There is a significant difference between at least one of these groups from the other groups. However if we want to know more, we would need to run a post-hoc test. 
+```{r}
+TukeyHSD(aov1)
+```
+What can we say about this now? 
+
+Just to practice visualizing that: 
+```{r}
+ANES %>% 
+  filter(!is.na(pid3)) %>%
+  ggplot(aes(x=scientists, fill = pid3,  color=pid3, na.rm=TRUE)) +
+  geom_density(adjust=3, alpha=.1, na.rm=TRUE ) + 
+  ggtitle("Distributions of Views of Scientists by Political Party") +
+  scale_x_continuous(name = "Gaussian Distribution of Views on Scientists")+
+  scale_y_continuous(name = "")+
+  theme(legend.title = element_blank())
+```
+Visualizing average income by race:
+*Note: You would want to create better titles, axis labels, etc.*
+```{r}
+ANES %>% 
+  filter(!is.na(race)) %>%
+  ggplot(aes(x=income, fill = race,  color=race, na.rm=TRUE)) +
+  geom_density(adjust=3, alpha=.1, na.rm=TRUE ) + 
+  ggtitle("Income by Race") +
+  scale_x_continuous(name = "Income")+
+  scale_y_continuous(name = "")+
+  theme(legend.title = element_blank())
+```

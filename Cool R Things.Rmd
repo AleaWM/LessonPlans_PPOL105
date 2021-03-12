@@ -1,0 +1,138 @@
+---
+title: "Tutorial"
+output: 
+  learnr::tutorial:
+    progressive: true # reveals one content section at a time.
+    allow_skip: true # students can skip sections or move on without completing a section
+    toc: true
+    toc_depth: 2
+    toc_float: yes
+    theme: journal
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE, exercise.checker=TRUE }
+
+library(learnr)
+
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+EatTweets <- read_csv("C:/Users/aleaw/OneDrive/Documents/GitHub/PPOL105/EatTweets.csv")
+```
+
+This data is from the .....
+```{r}
+EatTweets # as a tibble
+```
+```{r arrange, exercise = TRUE, eval=TRUE}
+# change the sort order to descending
+arrange(EatTweets, Year)
+```
+```{r Filter, exercise = TRUE, eval=TRUE}
+# change the filter to only at 1990. Then try 2012.
+filter(EatTweets, Year == "1985")
+```
+
+```{r Select, exercise  = TRUE}
+# change the code to only look at variables for the USA
+select(EatTweets, contains ("UK"))
+```
+```{r}
+custom_checker <- function(label, user_code, check_code, envir_result, evaluate_result, last_value, ...) {
+  # this is a code check
+  if (is.null(envir_result)) {
+    if (is_bad_code(user_code, check_code)) {
+      return(list(message = "I wasn't expecting that code", correct = FALSE))
+    }
+    return(list(message = "Nice code!", correct = TRUE))
+  }
+  # this is a fully evaluated chunk check
+  if (is_bad_result(last_value, check_code)) {
+    return(list(message = "I wasn't expecting that result", correct = FALSE))
+  }
+  list(message = "Great job!", correct = TRUE, location = "append")
+}
+
+tutorial_options(exercise.checker = custom_checker)
+```
+
+
+## Wealth Change Example {#wealthchange}
+```{r Plot}  
+wealthchange <- EatTweets %>% ggplot(aes(x = Year, y = USA_Pretax_income_top1)) + geom_point()
+
+wealthchange + annotate( "text", x = 1975, y=.2, label = "Average wealth for top 1%") # adds text at that location on the graph
+
+wealthchange + annotate("rect", ymin = .13, ymax = .15, xmin = 1980, xmax=1990, alpha = .4) # makes a rectangle on the graph
+
+```
+
+Bookdown Tips:
+https://happygitwithr.com/bookdown-cheat-sheet.html#cross-references
+```{r}
+# to refer to a different chunk or location in the text
+#\@ref(wealthchange) # in bookdown
+
+```
+
+## Topic 1
+
+### Exercise 
+
+*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+
+Write the R code required to add two plus two:
+
+```{r two-plus-two, exercise=TRUE}
+
+```
+
+### Exercise with Code
+
+*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
+
+Now write a function that adds any two numbers and then call it:
+
+```{r add-function, exercise=TRUE, exercise.lines = 5}
+add <- function() {
+  
+}
+```
+
+## Topic 2
+
+### Exercise with Hint
+
+*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+
+Modify the following code to limit the number of rows printed to 5:
+
+```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+EatTweets
+```
+
+```{r print-limit-hint}
+head(EatTweets)
+```
+
+## Quizes!
+
+```{r quiz}
+# *You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+
+quiz(
+  question("What's Alea's favorite animal?",
+    answer("Penguins"),
+    answer("Lions",  correct = TRUE),
+    answer("Aardvarks"),
+    answer("Groundhogs")
+  ),
+  question("Which of the R packages listed below are used to create plots?",
+    answer("lattice", correct = TRUE),
+    answer("tools"),
+    answer("stats"),
+    answer("grid", correct = TRUE)
+  )
+)
+```
+
