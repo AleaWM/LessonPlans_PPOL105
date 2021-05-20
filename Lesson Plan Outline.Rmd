@@ -1,0 +1,372 @@
+---
+title: "Lesson Plans"
+author: "Alea Wilbur"
+date: "5/5/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc float: true
+    theme: journal
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+# Resources 
+
+Introductory Statistics with R - Peter Dalgaard (2002)
+
+Tidyverse Skills for Data Science in R (2021)
+
+
+# Finding Data
+
+[UIC's data sources](https://researchguides.uic.edu/c.php?g=252510&p=5246067)
+UIC has a list of data sources of various types categorized as "Research Tools" and "Policy Documents" 
+If you don't remeber what your options are, this is a good place to start. Links to HUD, American Community Survey, USA Gov, CMAP, National Low Income Housing Coalition, Chicago Data Portal, just to name a few. UIC also allow students to access other large data repositories such as ICPSR, Policy Map, and more.
+
+[UIC data management tips] (https://researchguides.uic.edu/dataplans/datarepositories#s-lg-box-18625329)  
+
+# Data Management Plans
+https://researchdata.wisc.edu/wp-content/uploads/2010/04/data_plan_guide.pdf  
+- Data Types  
+- Describing Data  
+- Sharing Your Data  
+- Data Storage  
+
+# Intro to Github 
+Stage, Commit, Push, Pull with csv and excel files (and eventually R files)
+
+# Framing
+
+[COVID Cases](https://covid19datahub.io/)
+  Guidotti, E., Ardia, D., (2020), "COVID-19 Data Hub",
+  Journal of Open Source Software 5(51):2376, doi:
+  10.21105/joss.02376.
+```{r, verbose = FALSE}
+#install.packages("COVID19")
+library("COVID19")
+x <- covid19("USA", level = 2)
+x
+```
+
+
+A city reports that one specific street recycles 2.2 times as much as any other street.
+- Are the streets the same length?
+- Do equal numbers of people live on the streets?
+
+Measuring recycling at the street level isn't a useful statistic unless streets are otherwise identical.
+
+Alternatives:
+- Recycling amount per living unit
+- recycling amount per person
+- Compare it to the amount of trash
+We want to to adjust the amount recycled to take into account the number of people on the street. 
+
+
+Water Usage!
+Some districts compare themselves to other districts or cities compare themselves to other cities. Measuring the water used per capita per day.
+
+Alternatives:
+- water use per acre
+- Calculate proportions instead of raw numbers
+ 
+Findings show that water usage is highest for wealthy neighborhoods with large properties. 
+
+
+Expenditures
+
+```{r}
+# library("ggplot2")
+# library("stringr")
+# TaxExpenditure <- data.frame(Expenditure.Type = c(factor("Industry & workforce", "Defence", 
+#                                                        "Social security & welfare",
+#                                                        "Community services & culture", 
+#                                                        "Health", 
+#                                                        "Infrastructure, transport & energy",
+#                                                        "Education", 
+#                                                        "General government services")),
+#                              Expenditure.Amount = c(14.843, 21.277, 121.907, 8.044, 59.858, 13.221, 29.870, 96.797))
+# 
+# ggplot(data = TaxExpenditure,
+#        aes(x = reorder(Expenditure.Type, Expenditure.Amount), y = Expenditure.Amount, fill = Expenditure.Type)) +  
+#   geom_bar(stat = "identity") +  
+#   scale_y_continuous(breaks = seq(0, 125, by = 25), limits = c(0,125), expand=c(0,0)) +  
+#   scale_x_discrete(labels=function(x) str_wrap(x, width=20)) +  
+#   labs(x="Expenditure type", y="Expenditure ($millions)") +  
+#   scale_fill_brewer(palette = "Set3") + 
+#   coord_flip() +  
+#   theme(panel.grid.minor.y=element_blank(), 
+#         panel.grid.major.x = element_line(color = "gray"),        
+#         panel.background = element_blank(), 
+#         axis.line = element_line(color="gray", size = 1),        
+#         axis.text=element_text(size=10), 
+#         axis.title=element_text(size=15), 
+#         plot.margin=margin(5,15,5,5),        
+#         legend.position = "none")
+
+```
+
+
+
+# Univariate Data
+Univariate data involves analyzing one variable. It does not deal with causal relationships and it is mostly used to describe the variable. 
+```{r, include=FALSE}
+ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes_timeseries_2020_stata_20210324.dta")
+#ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes_timeseries_2020_stata_20210324.dta", col_select = c( V201001:V201006, V201019:V201629e, V201639: V201652))
+
+```
+
+## Categorical Data
+
+A categorical variable is made of categories. Even if a number is assigned to it for coding purposes, the numbers do not mean anything. (eg. taking the average of: 1. Blue, 2. Orange, 3. Green)
+```{r}
+# good vs bad examples. Link images.
+table(ANES2020$V201429)
+
+V202118 # How does the respondent normally vote?
+
+
+```
+Mode, Expected Value (don't cover?), Bar charts (avoid pie charts)
+
+
+## Numerical Data
+```{r}
+# good vs bad examples. Link images.
+```
+
+
+## Data Distribution 
+The density for a continuous distribution is a measure of relative probabily for getting a value close to x. The probability of getting a value in a particular interval is the area under the corresponding part of the curve. (Calc flashbacks...)
+```{r}
+x <- seq(-4, 4, 0.1)
+plot(x, dnorm(x), type = "l") # type = "l" tells R to connect the dots with a line instead of just graphing the points
+```
+
+- Frequency Tables:   
+- Histograms  hist(x)
+- Quantiles  
+- Q-Q plots  
+- Box Plots  
+```{r}
+x <- 0:50
+plot(x, dbinom(x, size = 50, prob = .33), type = "h") # h for histogram
+```
+
+But how do we describe the data or graphs? 
+
+
+### Central Tendency 
+(Central Tendency RMD)
+
+*Mean*: The average. Has a formula. In Excel: =AVERAGE((CELL_1 + CELL_2 + CELL_3)/(Number_Of_Cells))
+```{r}
+( 4 + 6 + 2 ) / 3
+```
+
+Calculate the mean
+```{r}
+# link generic forumla for equation or type it in
+#mean()
+```
+
+Discussion on outliers, potential use of trim mean
+```{r}
+#graph outliers 
+# trimmed mean
+```
+
+*Median*: Think of the thing between lanes in a road - the median. It is in the center. Equally distanced between both sides. Half of the observations are on one side, and half are on the other. 
+Medians are useful for "measuring the middle" when there are outliers.
+
+*Mode*: Observation that occurs the most often.
+When is the mean an inappropriate statistic?
+Bimodal distributions, groups.
+The mean and median might be somewhere between the two but does that tell us anything useful? Bimodal distributions indicate heterogeneity in the sample. If possible, look at the statistics for each group to gain more context.
+
+
+Use the Central Tendency Lesson.RMD file
+
+Discuss left and right skewed data
+
+```{r}
+# Murder rates in cities raw vs weighted by population
+```
+
+### Measures of Dispersion
+How tightly clustered or spread out is your data?
+
+Variance,Deviations, Range, Percentile, Degrees of Freedom
+
+Variability: The sum of squared deviations from the mean divided by n-1, where n is the number of data values.
+Standard deviation: Square root of the variance.
+```{r}
+# include images I made from 402 discussin standard deviation and variability
+```
+
+var()
+sd()
+min()
+max()
+range()
+summary()
+
+## Percentage Change
+
+```{r}
+
+```
+
+# Bivariate Data
+Bivariate data is used to find out if there is a relationship between two different variables. It is frequently represented with scatter plots where one variable is on the X axis and the other is on the Y axis. If the data seems to fit a line or curve then there may be a relationship, or correlation, between the two variables. Always be careful when examining relationships. Many variables may appear related when in fact their relationship happened by chance or a third variable is influencing both variables.
+
+*Test of Association*: Used to test whether two variables are related to one another or not
+- Depends on the nature of the variables you are studying (nominal, ordinal, interval) and number of categories
+- Depends on the nature of the question you're answering (independence, agreement of coders, effect of an intervention, etc.) 
+
+## Correlation 
+Correlation is the extent that two continuous (interval or ratio level) variables are related. A relationship exists when knowing the value of one variavble is useful for predicting the value of a second variable. 
+
+*Correlation Coefficient*: symmetric, scale-invariant measure of association between two variables  
+- Ranges from -1 to +1.
+  - Strength of Correlation: 0 means no  correlation, -1 and +1 imply perfect correlation (either one increases as the other decreases [-1] or they move in the same direction[+1])
+```{r}
+# income summary, ordinal
+ANES2020$V202468x 
+```
+
+### Pearson Correlation
+- assumes there is a normal distribution
+- cor() can be used to compute correlation between two or more vectors
+- cor.test() tells you if the correlation is significantly different than zero
+  - cor.test() has options for different correlation calculations (pearson (default), spearman, kendall)
+  - Spearman and Kendall correlation methods are NON-parametric tests, meaning the variables do not meet the assumptions based on a normal distribution. For this course, you do not need to worry about non-parametric tests BUT if you were doing your own analysis, you must remember that the type of test you use depends on your data and look into which tests are appropriate. 
+```{r}
+#cor(variable1, variable 2, use = "complete.obs")
+# cor.test(v1, v2)
+# cor.test(v1, v2, method = "spearman") # Spearman's p and Kendall for nonparametric 
+```
+
+
+### Scatterplots
+```{r}
+# ggplot() + geom_point()
+# ggscatter 
+```
+
+## Two-Way Tables
+- Contingency tables: A tally of counts between two or more categorical variables.
+
+```{r}
+# limits to campaign spending and 
+ANES%>% table(V202225, V)
+```
+
+- Violin plots: Frequently used for changes in population age
+- Boxplots: For categorical and numeric data
+- Facet Wrap
+
+### Interpreting
+
+### Creating
+
+### Change Over Time
+
+# Text Data
+## Cleaning Text
+- Trim Spaces  
+- Clean Symbols  
+- Other String Things  
+
+### Pivot 
+
+### Separate 
+
+### Combine
+
+
+# Tables
+```{r}
+#table()
+```
+
+```{r}
+#kableExtra::
+```
+
+# More Data Visualization 
+Good resource link for me: https://rstudio-conf-2020.github.io/r-for-excel/ggplot2.html#multi-series-ggplot-graphs
+
+Create a "fill in the blank" version of the code for students:
+- Read in external data (Excel files, CSVs) 
+- Initial data exploration
+- Build several common types of graphs (scatterplot, column, line) in ggplot2
+- Customize graph aesthetics (color, style, themes, etc.)
+- Update axis labels and titles
+- Combine compatible graph types (geoms)
+- Build multiseries graphs
+- Split up data into faceted graphs
+- Export figures with ggsave()
+
+## Bad Graph things - Axis Shenanigans
+- Unlabeled axes  
+- Truncated vertical axis
+- Discontinuity of vertical or horizontal axis
+- Double axes with misleading scales
+
+### Crime Data over time example
+What happened to the total population during the time period? 
+Did population grow at larger rate than the topic being studied? Has the 
+
+# Fun Stuff
+Mostly just showing what exists, can provide example code for a few topics
+- GIFs  
+- Maps  
+- Twitter Data / Scraping 
+
+
+# Excel v R commands
+
+## Descriptive Statistics
+
+CORREL() and PEARSON() are the same in excel
+
+Desc() from DescTools
+
+Save and SaveAs is write_csv()
+
+MAX(), MIN(), AVERAGE(), COUNT()  STDEV.S() for samples & STDEV.P() for populations
+MAX() - MIN() gives you the range
+
+
+# Tips for myself later
+
+
+If needed, you can also set text into your inline codes simply using the format **``` `mean(XXX)` ```**. 
+
+This will report your results into the text and save you time when updating your work! 
+
+
+Markdown Tips: 
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+You can make little tables with words.
+
+example:
+
+
+Function | When to use it
+---------|--------------------------
+**fct_relevel():** | Reorder factor levels by hand
+**fct_inorder():** | Reorder factor levels by first appearance
+**fct_infreq():**| Reorder factor levels by frequency
+**fct_inseq():** | Reorder factor levels by numeric order
+**fct_rev():** |Reverse order of factor levels
+**fct_reorder():** | Reorder factor levels by sorting along another variable (great fro cat-cont graphs)
+**fct_reorder2():** |Reorder factor levels by sorting along 2 other variables
+------------------------------------
+

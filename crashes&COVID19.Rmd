@@ -1,0 +1,281 @@
+---
+title: "Crashes & COVID19"
+author: "Alea Wilbur"
+date: "3/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(lubridate) 
+library(plotly)
+library(sf)
+library(leaflet) 
+library(tmap)
+library(highcharter) 
+library(ggsci)
+knitr::opts_chunk$set(echo = TRUE)
+#crash <- read_csv("~/GitHub/PPOL105/Traffic_Crashes_Cleaned.csv")
+crash <- read_csv("~/GitHub/PPOL105/Traffic_Crashes_Orig.csv")
+
+```
+
+
+This [link](https://rpubs.com/camilovelezr/tcc) has done most of the work for crashes
+
+[Example with utah and religions] (https://statsf18.classes.andrewheiss.com/files/your-name_problem-set-2.Rmd) 
+
+```{r}
+crash <- crash %>%  # READ IN ORIGINAL FILE
+  select(-c(CRASH_RECORD_ID, CRASH_DATE_EST_I, TRAFFIC_CONTROL_DEVICE, DEVICE_CONDITION, LANE_CNT, ALIGNMENT, ROAD_DEFECT, REPORT_TYPE, INTERSECTION_RELATED_I:HIT_AND_RUN_I, DATE_POLICE_NOTIFIED,PHOTOS_TAKEN_I:DOORING_I,NUM_UNITS, INJURIES_INCAPACITATING:INJURIES_REPORTED_NOT_EVIDENT, INJURIES_UNKNOWN)) 
+
+#crash$CRASH_DATE <- mdy_hms(crash$CRASH_DATE) # Remove hours, I did this in excel already for the cleaned version. It also exists already in another column
+
+#crash$CRASH_DATE <- as_date(crash$CRASH_DATE)
+```
+
+
+```{r}
+
+min(crash$CRASH_DATE) # March 3rd, 2013
+crash <- crash %>%
+  filter(CRASH_DATE >= (mdy("1/1/2019"))) # 222,717 observations remaining
+min(crash$CRASH_DATE) # January 1, 2019
+```
+
+
+```{r}
+# data %>%
+#   mutate(educcat_F = fct_recode(educcat_F, #<<
+#                                 "1" = "Less Than High School", #<<
+#                                 "2" = "High School", #<<
+#                                 "3" = "Junior College",#<<
+#                                 "4" = "Bachelor", #<<
+#                                 "5" = "Graduate")) %>% #<<
+#   group_by(educcat_F) %>%
+#   summarize(count = n())
+# class(crash$POSTED_SPEED_LIMIT)
+# crash %>% mutate(POSTED_SPEED_LIMIT == recode(POSTED_SPEED_LIMIT, 
+#                                               1:7 = 5,
+#                                               8:12 = 10)) 
+#                  POSTED_SPEED_LIMIT == 13:17, 15, POSTED_SPEED_LIMIT | 
+#                  POSTED_SPEED_LIMIT == 18:22, 20, POSTED_SPEED_LIMIT) | 
+#                  POSTED_SPEED_LIMIT == 23:27 -> 25,
+#                  POSTED_SPEED_LIMIT == 28:32 -> 30,
+#                  POSTED_SPEED_LIMIT == 33:37 -> 35,
+#                  POSTED_SPEED_LIMIT == 38:42 -> 40,
+#                  POSTED_SPEED_LIMIT == 43:47 -> 45,
+#                  POSTED_SPEED_LIMIT == 48:52 -> 50,
+#                  POSTED_SPEED_LIMIT == 53:57 -> 55,
+#                  POSTED_SPEED_LIMIT == 58:62 -> 60,
+#                  POSTED_SPEED_LIMIT == 63:70 -> 65)
+
+
+slc <- crash %>% 
+  filter(POSTED_SPEED_LIMIT %in% seq(from=5, to=70, by=5)) %>% 
+    group_by(speed_limit=POSTED_SPEED_LIMIT) %>% 
+    summarize(n=n())
+slc
+```
+
+```{r}
+#crashes per year
+count <- crash %>% 
+  group_by(year= year(CRASH_DATE), month= month(CRASH_DATE)) %>% 
+  summarize(n=n())
+
+count %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(name = "Number of Crashes")
+```
+```{r}
+#crashes at each speed limit
+speedcount <- crash %>% 
+  group_by(speed_limit=POSTED_SPEED_LIMIT) %>% 
+  summarize(n=n()) 
+
+speedcount # as a tibble
+```
+Really good link for Kable charts:
+https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+```{r}
+library(kableExtra) # make your charts pretty
+
+
+kbl(speedcount)
+
+speedcount %>% 
+  kbl(caption = "Crashes in Each Speed Limit within Chicago") %>% 
+  kable_classic( full_width = T) %>%
+  column_spec(1,  # column 1
+              bold=T,  # make it bold
+              border_right = T) %>% # add the line on the right side of the column
+  column_spec(2, background="green")
+
+```
+```{r}
+kbl(speedcount) %>%
+  kable_classic() %>%
+  add_header_above(c(" " = 1, "Group 1" = 1)) # number of items in each group and gives them a label
+
+# cooler if you are trying to grouop multiple variables in a chart. 
+```
+
+```{r}
+n1 <- slc %>% 
+  ggplot(aes(x=speed_limit,y=n))+
+  geom_bar(stat = "identity",fill="#68ccff")+
+  scale_x_continuous(breaks=seq(5,70,5), labels=seq(5,70,5))+
+  ylab("Crashes")+
+  xlab("Posted Speed Limit (mph)")+
+  theme(panel.background = element_rect(fill = "#e8f7ff"), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+```
+
+# Details
+
+- Who did you collaborate with: xxxx
+- Approximately how much time did you spend on this problem set: xxxx
+- What, if anything, gave you the most trouble: xxxx
+
+
+# Load and wrangle data
+
+Load two CSV files and join them to create a data frame named `crashes` (i.e. using `crashes` as the main data frame, left join `COVID19` to it)
+
+```{r load-libraries-data}
+library(tidyverse)
+
+crashes <- read_csv("data/  .csv")
+COVID19 <- read_csv("data   .csv")
+```
+
+```{r wrangle-data}
+# Do something to add the names of the religions
+religion_utah <- religions
+```
+
+
+# Answer questions
+
+Answer the following questions. I occasionally provide a chunk of code to help you get started. 
+
+## General religious landscape
+
+### Top religions
+
+What are the top 10 religions in Utah, based on number of adherents?
+
+```{r top-10-adherents}
+top_10_adherents <- religion_utah %>% 
+  group_by(religion_clean) %>% 
+  summarize(total = sum(adherents, na.rm = TRUE)) %>% 
+  top_n(10, total) %>% 
+  arrange(desc(total))
+
+top_10_adherents
+```
+
+Make a bar plot of the top 10 religions in Utah, by adherents:
+
+```{r top-10-adherents-plot}
+# Here we make a copy of the top_10_adherents data from above and we
+# change/mutate the `religion_clean` column so that the religion labels are in
+# order (that's what `fct_inorder()` does---it converts `religion_clean` into a
+# list of categories and puts them in a specific order)
+top_10_adherents_plot <- top_10_adherents %>% 
+  mutate(religion_clean = fct_inorder(religion_clean))
+
+# Notice the `fct_rev()` here. That takes the list of categories in
+# `religion_clean` and reverses them. If they're not reversed, they'll be
+# plotted from lowest to highest, and LDS will be at the bottom.
+#
+# Also notice the `coord_flip()` layer. This rotates the plot so the bars go
+# horizontally intead of vertically
+ggplot(top_10_adherents_plot, aes(x = fct_rev(religion_clean), y = total)) +
+  geom_col() + 
+  labs(x = "Denomination", y = "Number of adherents") +
+  coord_flip()
+```
+
+
+Which 10 religions have the most number of congregations?
+
+```{r top-10-congregations}
+
+```
+
+Make a bar plot of the top 10 religions in Utah, by congregations:
+
+```{r top-10-congregations-plot}
+
+```
+
+
+Why are Catholics ranked differently in the two tables? xxxx
+
+
+### Proportion of membership in total population
+
+Utah's total population in 2010 was 2,763,885. Calculate the proportion of each of the top 10 religions based on this population (i.e. Catholics made up X percent of Utah's population in 2010).
+
+Hint: copy the code from the `top-10-adherents` chunk above and use `mutate()` to create a new column.
+
+```{r top-10-adherents-percent}
+
+```
+
+
+## LDS membership
+
+Which 5 counties in Utah have the most LDS members (or adherents)?
+
+```{r top-5-lds-adherents}
+religion_utah %>% 
+  filter(religion_clean == "LDS") %>% 
+  top_n(5, adherents) %>% 
+  arrange(desc(adherents)) %>% 
+  select(county, religion_clean, adherents)
+```
+
+Which 5 counties in Utah have the most LDS congregations?
+
+```{r top-5-lds-congregations}
+
+```
+
+Which 5 counties in Utah have the highest proportion of LDS members? (i.e. `adherents_per_1000`)
+
+```{r top-5-lds-proportion}
+
+```
+
+Why are these answers not all the same? xxxx
+
+
+## Non-LDS membership
+
+What are the top 5 non-LDS religions in Utah, based on number of adherents?
+
+```{r top-5-non-lds-adherents}
+
+```
+
+
+Which 10 counties have the highest proportion (`adherents_per_1000`) of non-LDS religions? What are those religions?
+
+```{r top-10-non-lds-counties}
+
+```
+
+Which 5 counties have the highest proportion of Muslims?
+
+```{r top-5-muslims}
+
+```
+
+Which 5 counties have the highest proportion of Buddhists?
+
+```{r top-5-buddhists}
+
+```
