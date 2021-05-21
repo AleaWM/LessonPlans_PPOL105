@@ -21,7 +21,7 @@ Introductory Statistics with R - Peter Dalgaard (2002)
 Tidyverse Skills for Data Science in R (2021)
 
 
-# Finding Data
+# Finding Data  
 
 [UIC's data sources](https://researchguides.uic.edu/c.php?g=252510&p=5246067)
 UIC has a list of data sources of various types categorized as "Research Tools" and "Policy Documents" 
