@@ -29,17 +29,11 @@ If you don't remeber what your options are, this is a good place to start. Links
 
 [UIC data management tips] (https://researchguides.uic.edu/dataplans/datarepositories#s-lg-box-18625329)  
 
-# Data Management Plans
-https://researchdata.wisc.edu/wp-content/uploads/2010/04/data_plan_guide.pdf  
-- Data Types  
-- Describing Data  
-- Sharing Your Data  
-- Data Storage  
-
 # Intro to Github 
 Stage, Commit, Push, Pull with csv and excel files (and eventually R files)
 
 # Framing
+Framing is the way that a statistic is reported. Context or comparison groups can influence the interpretation of the statistic. Calculating proportions instead of actual numbers sometimes helps provie the true frame. 
 
 [COVID Cases](https://covid19datahub.io/)
   Guidotti, E., Ardia, D., (2020), "COVID-19 Data Hub",
@@ -109,6 +103,15 @@ Expenditures
 
 ```
 
+### Vocab
+
+Bimodal distriubtion: a set of observations where two values occur more than often than the other values. A graph of the frequency shows two peaks in the distribution. 
+
+*Accuracy*: How close a number is to the true quantity being measured. Different than precision. 
+*Precision*: A measure of the level of detail, or resolution, in a number. 98.683 is more precise than 100, but if the true value is 101.00, than a measurement equal to 100 is more accurate. 
+
+*Incidence*: Number of new cases reported in a specific time
+*Prevalence*: Number of existing caes (cumulative)
 
 
 # Univariate Data
@@ -145,6 +148,8 @@ The density for a continuous distribution is a measure of relative probabily for
 x <- seq(-4, 4, 0.1)
 plot(x, dnorm(x), type = "l") # type = "l" tells R to connect the dots with a line instead of just graphing the points
 ```
+
+
 
 - Frequency Tables:   
 - Histograms  hist(x)
@@ -216,6 +221,7 @@ summary()
 
 ## Percentage Change
 
+ERCOT data on the Texas Winter Storm
 ```{r}
 
 ```
@@ -229,10 +235,27 @@ Bivariate data is used to find out if there is a relationship between two differ
 
 ## Correlation 
 Correlation is the extent that two continuous (interval or ratio level) variables are related. A relationship exists when knowing the value of one variavble is useful for predicting the value of a second variable. 
+```{r}
+set.seed(1827)
+a.random = rnorm(50)
+
+b.data = data.frame(replicate(100, rnorm(50)))
+
+cor.size = vector()
+for (i in 1: 100)
+  cor.size[i] = cor.test(a.random, b.data[,i])$estimate
+
+cor.results = vector()
+for (i in 1: 100)
+   cor.results[i] = cor.test(a.random, b.data[,i])$p.value
+
+```
 
 *Correlation Coefficient*: symmetric, scale-invariant measure of association between two variables  
 - Ranges from -1 to +1.
   - Strength of Correlation: 0 means no  correlation, -1 and +1 imply perfect correlation (either one increases as the other decreases [-1] or they move in the same direction[+1])
+
+
 ```{r}
 # income summary, ordinal
 ANES2020$V202468x 
