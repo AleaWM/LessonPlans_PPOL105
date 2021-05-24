@@ -1,0 +1,61 @@
+---
+title: "TexasWinterStorm"
+author: "Alea Wilbur"
+date: "5/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library("eia")
+library(kableExtra)
+```
+
+
+# Texas Winter Storm Analysis
+
+Data source: [U.S. Energy Information Administration](https://www.eia.gov/)
+
+```{r}
+eia_set_key("c0817f67f7817ab45b9f7e8dbf0de9bb")
+# Prep the responses
+base_url = 'http://api.eia.gov/series/?series_id='
+
+
+variables <- c("EBA.TEX-ALL.NG.NG.H", "EBA.TEX-ALL.NG.WND.H", "EBA.TEX-ALL.NG.COL.H", "EBA.TEX-ALL.NG.SUN.H", "EBA.TEX-ALL.NG.WAT.H", "EBA.TEX-ALL.NG.NUC.H")
+
+list <- eia_series(variables, start = 2021)
+
+list$data[[3]] # 3,438 X 5 tibble
+
+unlist <- unnest(list, cols = data)
+unlist
+```
+
+
+```{r}
+unlist<- unnest(list, cols = data) %>%
+  select(date, series_id, value) %>%
+  pivot_wider(names_from = series_id,
+              values_from = value)
+unlist
+```
+
+
+```{r}
+unlist <- unlist %>% rename("Natural Gas" = "EBA.TEX-ALL.NG.NG.H", 
+                  "Wind" = "EBA.TEX-ALL.NG.WND.H", 
+                  "Coal" = "EBA.TEX-ALL.NG.COL.H", 
+                  "Solar" = "EBA.TEX-ALL.NG.SUN.H", 
+                 "Water" = "EBA.TEX-ALL.NG.WAT.H", 
+                "Nuclear" =  "EBA.TEX-ALL.NG.NUC.H")
+unlist
+```
+
+
+```{r}
+write_csv(unlist, "TexasEnergyData.csv")
+```
+
+

@@ -334,6 +334,11 @@ Create a "fill in the blank" version of the code for students:
 - Split up data into faceted graphs
 - Export figures with ggsave()
 
+## Data visualization Comments
+
+- people are bad at judging angles and areas
+  - line and bar chats are usually good options whereas pie charts or charts that use size of an object to represent the magnitude of data are less intuitive BUT this depends on your data and what you are trying to communicate. 
+
 ## Bad Graph things - Axis Shenanigans
 - Unlabeled axes  
 - Truncated vertical axis

@@ -23,6 +23,31 @@ crashes <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/Original Datase
 
 ```
 
+```{r}
+## Install the required package with:
+#install.packages("RSocrata")
+
+library("RSocrata")
+
+df <- read.socrata(
+  "https://data.cityofchicago.org/resource/85ca-t3if.csv", 
+  app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
+  email     = "awilbu2@uic.edu",
+  password  = "Supersoup!55"
+)
+
+df2 <- read.socrata(
+  "https://data.cityofchicago.org/resource/85ca-t3if.csv?$where = crash_date>2019-01-01T00:00:01", 
+  app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
+  email     = "awilbu2@uic.edu",
+  password  = "Supersoup!55"
+)
+#API KEY ID
+# 7wozsduhlxqle390n4kjkd7a5
+
+# API Key Secret
+# 49p2nh9108wuuine4z720roen4x6yyd2wd5wtn8qdennfrsksb
+```
 
 This [link](https://rpubs.com/camilovelezr/tcc) has done most of the work for crashes
 
