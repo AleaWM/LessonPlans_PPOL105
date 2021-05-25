@@ -25,12 +25,9 @@ Tidyverse Skills for Data Science in R (2021)
 
 [UIC's data sources](https://researchguides.uic.edu/c.php?g=252510&p=5246067)
 UIC has a list of data sources of various types categorized as "Research Tools" and "Policy Documents" 
-If you don't remeber what your options are, this is a good place to start. Links to HUD, American Community Survey, USA Gov, CMAP, National Low Income Housing Coalition, Chicago Data Portal, just to name a few. UIC also allow students to access other large data repositories such as ICPSR, Policy Map, and more.
+If you don't remember what your options are, this is a good place to start. Links to HUD, American Community Survey, USA Gov, CMAP, National Low Income Housing Coalition, Chicago Data Portal, just to name a few. UIC also allow students to access other large data repositories such as ICPSR, Policy Map, and more.
 
 [UIC data management tips] (https://researchguides.uic.edu/dataplans/datarepositories#s-lg-box-18625329)  
-
-# Intro to Github 
-Stage, Commit, Push, Pull with csv and excel files (and eventually R files)
 
 # Framing
 Framing is the way that a statistic is reported. Context or comparison groups can influence the interpretation of the statistic. Calculating proportions instead of actual numbers sometimes helps provie the true frame. 
@@ -255,6 +252,8 @@ for (i in 1: 100)
 - Ranges from -1 to +1.
   - Strength of Correlation: 0 means no  correlation, -1 and +1 imply perfect correlation (either one increases as the other decreases [-1] or they move in the same direction[+1])
 
+
+"A large and common mistake is to compute correlations of data that are not approximated by bi-variate normal data. Averages, standard deviations and correlations are popular summary statistics for two-dimensional data because, for the bivariate normal distribution, these five parameters fully describe the distribution. However, there are many examples of data that are not well approximated by bivariate normal data. Gene expression data, for example, tends to have a distribution with a very fat right tail."
 
 ```{r}
 # income summary, ordinal

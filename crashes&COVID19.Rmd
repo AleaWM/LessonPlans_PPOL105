@@ -50,9 +50,8 @@ crashes <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/Original Datase
 # 49p2nh9108wuuine4z720roen4x6yyd2wd5wtn8qdennfrsksb
 ```
 
+# Chicago Crash Data
 This [link](https://rpubs.com/camilovelezr/tcc) has done most of the work for crashes
-
-[Example with utah and religions] (https://statsf18.classes.andrewheiss.com/files/your-name_problem-set-2.Rmd) 
 
 ```{r}
 crash <- crashes 
@@ -295,19 +294,3 @@ states_covid %>%
 [COVID-19 Data](https://github.com/Covid19R/covid19nytimes)
 
 
-# Example HW from online
-
-- Who did you collaborate with: xxxx
-- Approximately how much time did you spend on this problem set: xxxx
-- What, if anything, gave you the most trouble: xxxx
-
-
-# Load and wrangle data
-
-Load two CSV files and join them to create a data frame named `crashes` (i.e. using `crashes` as the main data frame, left join `COVID19` to it)
-
-```{r load-libraries-data}
-
-#crashes <- read_csv("data/  .csv")
-#COVID19 <- read_csv("data   .csv")
-```
