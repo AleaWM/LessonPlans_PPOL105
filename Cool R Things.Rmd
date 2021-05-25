@@ -17,7 +17,7 @@ library(learnr)
 
 library(tidyverse)
 knitr::opts_chunk$set(echo = FALSE)
-EatTweets <- read_csv("C:/Users/aleaw/OneDrive/Documents/GitHub/PPOL105/EatTweets.csv")
+EatTweets <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/EatTweets.csv")
 ```
 
 This data is from the .....

@@ -3,7 +3,7 @@ title: "Crashes & COVID19"
 author: "Alea Wilbur"
 date: "3/1/2021"
 output: html_document
-runtime: shiny
+#runtime: shiny
 ---
 
 # Setup
@@ -19,30 +19,30 @@ library(ggsci)
 library(kableExtra) # make your charts pretty
 #devtools::install_github("covid19R/covid19nytimes")
 library(covid19nytimes)
-library(RSocrata)
+library("RSocrata")
 
 
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 #crash <- read_csv("~/GitHub/PPOL105/Traffic_Crashes_Cleaned.csv")
-crashes <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/Original Datasets_Dont Touch/Traffic_Crashes_Orig.csv")
+#crashes <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/Original Datasets_Dont Touch/Traffic_Crashes_Orig.csv")
 
 ```
 
 ```{r}
 
-# df <- read.socrata(
-#   "https://data.cityofchicago.org/resource/85ca-t3if.csv", 
-#   app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
-#   email     = "awilbu2@uic.edu",
-#   password  = "Supersoup!55"
-# )
-# 
-# df2 <- read.socrata(
-#   "https://data.cityofchicago.org/resource/85ca-t3if.csv?$where = crash_date>2019-01-01T00:00:01", 
-#   app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
-#   email     = "awilbu2@uic.edu",
-#   password  = "Supersoup!55"
-# )
+df <- read.socrata(
+  "https://data.cityofchicago.org/resource/85ca-t3if.csv", 
+  app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
+  email     = "awilbu2@uic.edu",
+  password  = "Supersoup!55"
+)
+
+df2 <- read.socrata(
+  "https://data.cityofchicago.org/resource/85ca-t3if.csv?$where = crash_date>2019-01-01T00:00:01", 
+  app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
+  email     = "awilbu2@uic.edu",
+  password  = "Supersoup!55"
+)
 #API KEY ID
 # 7wozsduhlxqle390n4kjkd7a5
 
@@ -257,8 +257,6 @@ head(covid19nytimes_counties_demo) %>% kable()
 
 
 ```{r}
-library(covid19nytimes)
-
 states_covid <- refresh_covid19nytimes_states() # 48,198 observations, 7 variables
 
 
@@ -275,11 +273,11 @@ us_states_long %>%
 
 
 ```{r}
-#counties_covid <- refresh_covid19nytimes_counties() # BIG file, 2,697,942 obs, 7 variables
+counties_covid <- refresh_covid19nytimes_counties() # BIG file, 2,697,942 obs, 7 variables
 ```
 
 ```{r}
-states_covid %>%
+covid19nytimes_states %>%
   filter(location %in% c("Washington", "New York", "Massachusetts", "Michigan", "Illinois")) %>%
   filter(data_type == "deaths_total") %>%
   ggplot(aes(x = date, y = value, color = location)) +
@@ -293,6 +291,11 @@ states_covid %>%
 [Chicago Traffic Crash Data](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if)
 
 [COVID-19 Data](https://github.com/Covid19R/covid19nytimes)
+
+
+```{r}
+
+```
 
 
 # Example HW from online
