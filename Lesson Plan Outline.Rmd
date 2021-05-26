@@ -14,7 +14,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
-# Resources 
+# Readings and Resources 
 
 Introductory Statistics with R - Peter Dalgaard (2002)
 
@@ -30,7 +30,7 @@ If you don't remember what your options are, this is a good place to start. Link
 [UIC data management tips] (https://researchguides.uic.edu/dataplans/datarepositories#s-lg-box-18625329)  
 
 # Framing
-Framing is the way that a statistic is reported. Context or comparison groups can influence the interpretation of the statistic. Calculating proportions instead of actual numbers sometimes helps provie the true frame. 
+Framing is the way that a statistic is reported. Context or comparison groups can influence the interpretation of the statistic. Calculating proportions instead of actual numbers sometimes helps provide the true frame. 
 
 [COVID Cases](https://covid19datahub.io/)
   Guidotti, E., Ardia, D., (2020), "COVID-19 Data Hub",
@@ -130,7 +130,7 @@ V202118 # How does the respondent normally vote?
 
 
 ```
-Mode, Expected Value (don't cover?), Bar charts (avoid pie charts)
+Mode, Expected Value (don't cover?), Bar charts, Line charts (avoid pie charts)
 
 
 ## Numerical Data
