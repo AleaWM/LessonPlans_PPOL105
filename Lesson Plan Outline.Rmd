@@ -13,6 +13,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(haven)
 ```
 # Readings and Resources 
 
@@ -114,7 +115,7 @@ Bimodal distriubtion: a set of observations where two values occur more than oft
 # Univariate Data
 Univariate data involves analyzing one variable. It does not deal with causal relationships and it is mostly used to describe the variable. 
 ```{r, include=FALSE}
-ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes_timeseries_2020_stata_20210324.dta")
+ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/anes_timeseries_2020_stata_20210324.dta")
 #ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes_timeseries_2020_stata_20210324.dta", col_select = c( V201001:V201006, V201019:V201629e, V201639: V201652))
 
 ```
@@ -124,9 +125,9 @@ ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes
 A categorical variable is made of categories. Even if a number is assigned to it for coding purposes, the numbers do not mean anything. (eg. taking the average of: 1. Blue, 2. Orange, 3. Green)
 ```{r}
 # good vs bad examples. Link images.
-table(ANES2020$V201429)
+#table(ANES2020$V201429)
 
-V202118 # How does the respondent normally vote?
+#V202118 # How does the respondent normally vote?
 
 
 ```
@@ -257,7 +258,7 @@ for (i in 1: 100)
 
 ```{r}
 # income summary, ordinal
-ANES2020$V202468x 
+head(ANES2020$V202468x )
 ```
 
 ### Pearson Correlation
@@ -284,7 +285,7 @@ ANES2020$V202468x
 
 ```{r}
 # limits to campaign spending and 
-ANES%>% table(V202225, V)
+#ANES%>% table(V202225, V)
 ```
 
 - Violin plots: Frequently used for changes in population age
@@ -297,7 +298,69 @@ ANES%>% table(V202225, V)
 
 ### Change Over Time
 
+
 # Text Data
+
+```{r}
+library(readxl)
+DisasterDeclarations <- read_xlsx("C:/Users/aleaw/OneDrive/Desktop/PhD Spring 2021/Project Data/DisasterDeclarationsSummaries.xlsx")
+
+
+DisasterSummary<- DisasterDeclarations %>% 
+  select(femaDeclarationString:declarationTitle, fipsStateCode:declarationRequestNumber) %>%
+  filter(designatedArea == c("Broward (County)", "Miami-Dade (County)"),
+        fipsCountyCode > 0) %>%
+  group_by(fipsStateCode, fipsCountyCode, designatedArea, fyDeclared, incidentType) %>%
+  summarize(declarations = n())
+
+write_csv(DisasterSummary, "C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Excel_Files/BrowardDisasters.csv")
+
+
+
+Claims <- read_csv("C:/Users/aleaw/OneDrive/Desktop/PhD Spring 2021/Project Data/SampleFiles/FEMAClaims.csv") 
+claimssummary <- Claims %>%
+  select(countyCode, state, yearOfLoss)%>%
+  filter(countyCode == c("12011" , "12086"),
+         yearOfLoss > 1999) %>% 
+  group_by(countyCode, state, yearOfLoss) %>%
+  summarize(claims = n()) 
+
+write_csv(claimssummary, "C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Excel_Files/BrowardInsuranceClaims.csv")
+
+
+disasterswide <-pivot_wider(DisasterSummary, 
+                             names_from = c(fyDeclared),
+                             names_sep = "_",
+                             values_from = c(declarations)
+                             )
+disasterswide
+
+disasterswide2 <- pivot_wider(DisasterSummary, 
+                             names_from = c(incidentType),
+                             names_glue = "{incidentType}_{.value}",
+                             values_from = c(declarations)
+                             )
+disasterswide2
+
+disasterswide3 <- pivot_wider(DisasterSummary, 
+                             names_from = c(fyDeclared, incidentType),
+                             values_from = c(declarations))
+disasterswide3
+
+disasterswide4 <-   DisasterDeclarations %>%
+  select(femaDeclarationString:declarationTitle, fipsStateCode:declarationRequestNumber) %>%
+  filter(state == "FL",
+         fipsCountyCode > 0) %>%
+  group_by(fipsStateCode, state, fipsCountyCode, designatedArea, fyDeclared, incidentType) %>%
+  summarize(declarations = n()) %>%
+  pivot_wider( ,
+                             names_from = c(incidentType, fyDeclared),
+                           #  names_glue = "{variable}_{.value}",
+                             values_from = c(declarations)
+                             )
+disasterswide4
+```
+
 ## Cleaning Text
 - Trim Spaces  
 - Clean Symbols  
