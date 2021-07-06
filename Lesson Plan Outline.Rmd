@@ -64,25 +64,25 @@ x
 ```
 
 
-A city reports that one specific street recycles 2.2 times as much as any other street.
-- Are the streets the same length?
-- Do equal numbers of people live on the streets?
+A city reports that one specific street recycles 2.2 times as much as any other street.  
+- Are the streets the same length?  
+- Do equal numbers of people live on the streets?  
 
 Measuring recycling at the street level isn't a useful statistic unless streets are otherwise identical.
 
-Alternatives:
-- Recycling amount per living unit
-- recycling amount per person
-- Compare it to the amount of trash
+Alternatives:  
+- Recycling amount per living unit  
+- recycling amount per person  
+- Compare it to the amount of trash  
 We want to to adjust the amount recycled to take into account the number of people on the street. 
 
 
-Water Usage!
+Water Usage!  
 Some districts compare themselves to other districts or cities compare themselves to other cities. Measuring the water used per capita per day.
 
-Alternatives:
-- water use per acre
-- Calculate proportions instead of raw numbers
+Alternatives:  
+- water use per acre  
+- Calculate proportions instead of raw numbers  
  
 Findings show that water usage is highest for wealthy neighborhoods with large properties. 
 
@@ -122,11 +122,11 @@ Expenditures
 
 Bimodal distriubtion: a set of observations where two values occur more than often than the other values. A graph of the frequency shows two peaks in the distribution. 
 
-*Accuracy*: How close a number is to the true quantity being measured. Different than precision. 
-*Precision*: A measure of the level of detail, or resolution, in a number. 98.683 is more precise than 100, but if the true value is 101.00, than a measurement equal to 100 is more accurate. 
+**Accuracy**: How close a number is to the true quantity being measured. Different than precision. 
+**Precision**: A measure of the level of detail, or resolution, in a number. 98.683 is more precise than 100, but if the true value is 101.00, than a measurement equal to 100 is more accurate. 
 
-*Incidence*: Number of new cases reported in a specific time
-*Prevalence*: Number of existing caes (cumulative)
+**Incidence**: Number of new cases reported in a specific time
+**Prevalence**: Number of existing caes (cumulative)
 
 
 # Univariate Data
@@ -146,7 +146,7 @@ Categorical variables are also called _nominal_ variables
 
 #V202118 # How does the respondent normally vote?
 ```
-Mode, Expected Value (don't cover?), Bar charts, Line charts (avoid pie charts)
+Frequencies, proportions, bar charts
 
 
 ## Numerical Data
@@ -171,6 +171,8 @@ attributes(anes$V201507x)
 table(anes$agecat)
 
 ```
+
+
 ### Discrete
 Data can be only integer values, such as counts.
 ```{r}
@@ -199,7 +201,7 @@ plot(x, dnorm(x), type = "l") # type = "l" tells R to connect the dots with a li
 
 
 
-- Frequency Tables:   
+- Frequency Tables   
 - Histograms  hist(x)
 - Quantiles  
 - Q-Q plots  
@@ -215,7 +217,8 @@ But how do we describe the data or graphs?
 ### Central Tendency 
 (Central Tendency RMD)
 
-*Mean*: The average. Has a formula. In Excel: =AVERAGE((CELL_1 + CELL_2 + CELL_3)/(Number_Of_Cells))
+**Mean**: The average. Has a formula.   
+In Excel: =AVERAGE((CELL_1 + CELL_2 + CELL_3)/(Number_Of_Cells))
 ```{r}
 ( 4 + 6 + 2 ) / 3
 ```
@@ -232,10 +235,10 @@ Discussion on outliers, potential use of trim mean
 # trimmed mean
 ```
 
-*Median*: Think of the thing between lanes in a road - the median. It is in the center. Equally distanced between both sides. Half of the observations are on one side, and half are on the other. 
+**Median**: Think of the thing between lanes in a road - the median. It is in the center. Equally distanced between both sides. Half of the observations are on one side, and half are on the other. 
 Medians are useful for "measuring the middle" when there are outliers.
 
-*Mode*: Observation that occurs the most often.
+**Mode**: Observation that occurs the most often.
 When is the mean an inappropriate statistic?
 Bimodal distributions, groups.
 The mean and median might be somewhere between the two but does that tell us anything useful? Bimodal distributions indicate heterogeneity in the sample. If possible, look at the statistics for each group to gain more context.
@@ -254,15 +257,15 @@ How tightly clustered or spread out is your data?
 
 Variance,Deviations, Range, Percentile, Degrees of Freedom
 
-*Variation*: The tendency of variables to change from measurement to measurement
-- Each measurement includes a small amount of error
-- Visualize the distribution of a variables values to find patterns in variation
-  - Chicago  traffic speed example
+**Variation**: The tendency of variables to change from measurement to measurement  
+- Each measurement includes a small amount of error  
+- Visualize the distribution of a variables values to find patterns in variation  
+  - Chicago  traffic speed example  
 
 
-*Variability*: The sum of squared deviations from the mean divided by n-1, where n is the number of data values.
+**Variability**: The sum of squared deviations from the mean divided by n-1, where n is the number of data values.
 
-*Standard deviation*: Square root of the variance.
+**Standard deviation**: Square root of the variance.
 ```{r}
 # include images I made from 402 discussin standard deviation and variability
 ```
@@ -277,6 +280,7 @@ summary()
 ## Percentage Change
 
 ERCOT data on the Texas Winter Storm
+Examples in slides on taxes changing, comparison of baselines
 ```{r}
 
 ```
@@ -284,9 +288,9 @@ ERCOT data on the Texas Winter Storm
 # Bivariate Data
 Bivariate data is used to find out if there is a relationship between two different variables. It is frequently represented with scatter plots where one variable is on the X axis and the other is on the Y axis. If the data seems to fit a line or curve then there may be a relationship, or correlation, between the two variables. Always be careful when examining relationships. Many variables may appear related when in fact their relationship happened by chance or a third variable is influencing both variables.
 
-*Test of Association*: Used to test whether two variables are related to one another or not
-- Depends on the nature of the variables you are studying (nominal, ordinal, interval) and number of categories
-- Depends on the nature of the question you're answering (independence, agreement of coders, effect of an intervention, etc.) 
+*Test of Association*: Used to test whether two variables are related to one another or not  
+- Depends on the nature of the variables you are studying (nominal, ordinal, interval) and number of categories  
+- Depends on the nature of the question you're answering (independence, agreement of coders, effect of an intervention, etc.)   
 
 ### Patterns and Models
 
@@ -316,9 +320,9 @@ for (i in 1: 100)
 
 ```
 
-*Correlation Coefficient*: symmetric, scale-invariant measure of association between two variables  
-- Ranges from -1 to +1.
-  - Strength of Correlation: 0 means no  correlation, -1 and +1 imply perfect correlation (either one increases as the other decreases [-1] or they move in the same direction[+1])
+**Correlation Coefficient**: symmetric, scale-invariant measure of association between two variables  
+- Ranges from -1 to +1.  
+- Strength of Correlation: 0 means no  correlation, -1 and +1 imply perfect correlation (either one increases as the other decreases [-1] or they move in the same direction[+1])  
 
 
 "A large and common mistake is to compute correlations of data that are not approximated by bi-variate normal data. Averages, standard deviations and correlations are popular summary statistics for two-dimensional data because, for the bivariate normal distribution, these five parameters fully describe the distribution. However, there are many examples of data that are not well approximated by bivariate normal data. Gene expression data, for example, tends to have a distribution with a very fat right tail."
@@ -367,7 +371,7 @@ for (i in 1: 100)
 
 
 # Cleaning Data
-
+_Reread Week 3: Tibble lecture for reminders on what to add_
 ```{r}
 DisasterDeclarations <- read_xlsx("C:/Users/aleaw/OneDrive/Desktop/PhD Spring 2021/Project Data/DisasterDeclarationsSummaries.xlsx")
 
@@ -397,7 +401,7 @@ write_csv(claimssummary, "C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Ex
 claimssummary %>% kable()
 ```
 
-
+### Pivot
 ```{r}
 disasterswide <-pivot_wider(DisasterSummary, 
                              names_from = c(fyDeclared),
@@ -446,22 +450,23 @@ disasterswide4 %>% kable()
 - Clean Symbols  
 - Other String Things  
 
-### Pivot 
-
-Practice
-1. You want to merge the immigration and education datasets. You want to keep all matching rows.
-
-2. You want to merge the immigration and education datasets and keep as much information as possible from the largest dataset.
-
-3. You want to merge the datasets education and income and keep as much information as possible from both datasets.
-
 ```{r}
 
 ```
 
-### Separate 
+###  Unite and Separate 
 
-### Combine
+**unite** is a function that allows you to combine the content of two or more columns. **separate** allows you to separate the content of one column into two or more columns.
+
+_Redo what we did in Excel and add it to the code_
+
+```{r}
+#separate()
+```
+
+```{r}
+# unite()
+```
 
 
 # Tables
@@ -521,7 +526,7 @@ This means that there are several ways to "code" in R and get to the same output
 
 ## Objects
 
-**Objects** are repositories of information - numbers, text, images... Each object has a name and we can assign content to an object using **<-**. You can also use **=** but the arrow is generally preferred
+**Objects** hold information - numbers, text, images... Each object has a name and we can assign content to an object using **<-**. You can also use **=** but the arrow is generally preferred
 
 
 Let's create an object storing the number 2
@@ -547,7 +552,7 @@ object1+object2
 
 ## Vectors
 
-An object that stores multiple pieces of information is called **vector**.
+An type of object that stores multiple pieces of information is called **vector**.
 
 **c** is the function that we use to **combine** multiple values into one object.
 
@@ -557,61 +562,48 @@ An object that stores multiple pieces of information is called **vector**.
 We can create an object called ob1 storing the following values: 1, 3, 4, 5, 5
 
 ```{r }
-
 ob1 <- c(1, 3, 4, 5, 5)
-
+ob1        # To inspect an object, you can just type its name.
 ```
-
-To inspect an object, you can just type its name.
-
-```{r }
-
-ob1
-
-```
-
 I strongly encourage you to always inspect your objects, vectors, matrices... Checking on your objects helps catch mistakes early.
 
 
 
 ### Object names
 
-- Object can have any name but you cannot use spaces in an object name (e.g., "Object A" -> "ObjectA")
+- Object can have any name but you *cannot* use spaces in an object name (e.g., "Object A" -> "ObjectA")
 
 - You can use a dot or an underscore to separate words (underscore is preferred)
 
-- R is case sensitive: I suggest using lowercase as much as possible
+- R is case sensitive
 
-- **Always** give your objects a "good name"
+- **Always** give your objects a "good name"  
     - Intuitive / meaningful
     - Concise / short    
     - Easy to remember
     - Unique (e.g., do not name an object as a variable or another object)
-    
 
-#### Some examples
+**Good names**  
+- data_1  
+- data_2   
+- crime_data  
 
-**Good names**
-- data_1
-- data_2 
-- crime_data
+**OK names**  
+- data.1 (dot)  
+- mydata (generic)  
 
-**OK names**
-- data.1 (dot)
-- mydata (generic)
+**Bad names**  
+- myfirstdata_nov222020 (too long)  
+- my_very_first_ObjectInR (too complex)  
 
-**Bad names**
-- myfirstdata_nov222020 (too long)
-- my_very_first_ObjectInR (too complex)
-
-**Very bad names** 
-- dsafdsafadf_daada (meaningless)
+**Very bad names**   
+- dsafdsafadf_daada (meaningless) 
 
 ## Strings
 
 We can store multiple type of values into a vector, not just numbers.
 
-**Strings** (or characters) are pieces of text information which are stored into **""** 
+**Strings** (or characters) are pieces of text information which are stored in quotation marks **""** 
 
 ```{r }
 
@@ -626,20 +618,16 @@ week_days
 To know the type of value stored into an object, we can use the command **class**. 
 
 ```{r }
-
-
+class(week_days)
 ```
 
-### Your turn!
+### Your turn! - Change example a little
 
-Create two objects, called "names" and "yob". 
+Create two objects, called "names" and "yob".   
+- names should be a string containing the following names: Mary, Mark, John, David, and Claudia  
+- yob should be a numeric vector containing the following years of birth: 1990, 1987, 1980, 1985, 1993  
 
-- names should be a string containing the following names: Mary, Mark, John, David, and Claudia
-
-
-- yob should be a numeric vector containing the following years of birth: 1990, 1987, 1980, 1985, 1993
-
-*Which is the class of each vector?*
+_Which is the class of each vector?_
 
 
 #### Solution
@@ -667,15 +655,13 @@ We now have two **vectors** containing multiple values. One vector is **characte
 Two or more vectors can be combined into a matrix. 
 
 In this case, we use either **rbind** or **cbind** to bind our data by row or column, respectively.
-
-
 ```{r}
 cbind(names, yob)
 
 rbind(names, yob)
 ```
 
-*What is the different between the two commands?*
+*What is the difference between the two commands?*
 
 Let's use cbind to create a matrix to 'play' with. We call it data_1.
 
@@ -716,16 +702,14 @@ Like in battleship, we can identify information contained in a matrix by their r
 ```{r }
 
 # Position: row 2, column 2
-
 data_1[2, 2]
 
 # Position: row 5, column 1
-
 data_1[5, 1]
 
 ```
 
-*What happens if you omit the column or the row number? E.g., data_1[2, ]?*
+_What happens if you omit the column or the row number? E.g., data_1[2, ]?_
 
 
 ## Numerical indexing
@@ -733,7 +717,6 @@ data_1[5, 1]
 ```{r }
 
 # No column is specified
-
 data_1[2, ]
 
 ```
@@ -741,7 +724,6 @@ data_1[2, ]
 ```{r }
 
 # No row is specified
-
 data_1[, 2]
 
 ```
@@ -751,7 +733,6 @@ We can use [] to subset an object
 ```{r }
 
 data_1[, 2]
-
 
 ```
 
@@ -854,31 +835,8 @@ You can always convert any vector (or column or row) from one class to the other
 - **as.**matrix
 - **as.**data.frame
 
-#### Your turn!
 
-Convert the names column from factor to character (save it as a new column)
-
-data_df$names2 <- as.character( ................ )
-
-Check the class of the new and old column
-
-Convert the yob column from factor to numeric (save it as a new column)
-
-
-#### Solutions
-
-```{r }
-
-data_df$names_R <- as.character(data_df$names)
-
-class(data_df$names_R)
-
-data_df$names
-
-data_df$names_R
-
-```
-Note: When you recode a variable, it's good practice to save it as a new one. 
+Note: When you recode a variable, it's good practice to save it as a new one. That way if you make a mistake, the original data still exists.  
 
 - It allows you to check your work 
 
@@ -887,20 +845,6 @@ Note: When you recode a variable, it's good practice to save it as a new one.
 - If you make a mistake, you don't have to upload your dataset again
 
 - You can always clean your dataframe at the end (e.g., keep only relevant columns)
-
-```{r }
-
-data_df$yob_R = as.numeric(data_df$yob)
-
-class(data_df$yob_R)
-
-data_df$yob_R
-
-data_df$yob
-
-```
-
-*What happened?* 
 
 ### From factor to numeric
 
@@ -1010,18 +954,11 @@ We are asking R to subset *data_df* and keep only those rows that have a value l
 
 data_df[data_df$yob_R2 < 1980, ]
 
-```
+data_df2 <- data_df[data_df$yob_R2 < 1980, ] # We could save it as a separate dataframe
 
-We could save it as a separate dataframe
-
-```{r }
-
-data_df2 <- data_df[data_df$yob_R2 < 1980, ]
 
 data_df2
-
 ```
-
 We can use logical indexing to perform operations on a subset of observations. Try to calculate the mean age for those individuals born before 1980 (start with code to calculate the mean age for everyone and modify it).
 
 
@@ -1073,13 +1010,15 @@ diamonds %>% count(cut) #categorical & ordinal
 ggplot(diamonds)+
   geom_bar(aes(cut))
 ```
+
 Continuous variable,can take any of an infinite set of ordered values. Numbers and date-times are examples of continuous variables. 
 ```{r}
 
 ggplot(diamonds) +
   geom_histogram(aes(carat), binwidth = 0.5)
 ```
-*Typical Values* are the common values of a variable.
+
+**Typical Values** are the common values of a variable.
 - Tall bars show common values
 - shorter bars show less-common values
 
@@ -1089,7 +1028,7 @@ ggplot(diamonds) +
 
    - Source: Chapter 5: Exploratory Data Analysis pg 88
    
-*Unusual Values* are observations that do not seem to fit the pattern, also called outliers. These can occur from data entry errors or may be from interesting points of study.
+**Unusual Values** are observations that do not seem to fit the pattern, also called outliers. These can occur from data entry errors or may be from interesting points of study.
 
 ```{r}
 ggplot(diamonds) +
@@ -1116,7 +1055,7 @@ outliers <- diamonds %>%
   arrange(y)
 outliers
 ```
-*Missing Values* 
+**Missing Values** 
 
 
 ```{r}
@@ -1126,7 +1065,7 @@ outliers
 # if y is less than 3 or greater than 2, change y to a missing value, otherwise leave it alone
 ```
 
-*Covariation* is when variation describes the behavior _between_ variables (Reminder: variation describes behavior _within_ a singular variable). The easiest way to spot covariation is to visualize the relationship between the two variables. Depending on the types of variables determines the best ways to visualize the relationships.
+**Covariation** is when variation describes the behavior _between_ variables (Reminder: variation describes behavior _within_ a singular variable). The easiest way to spot covariation is to visualize the relationship between the two variables. Depending on the types of variables determines the best ways to visualize the relationships.
 
 Categorical & Continuous Variables
 A frequency graph does a good job breaking down a continuous variable by a categorical variable. Histograms and vertical or horizontal bar graphs
@@ -1134,7 +1073,7 @@ A frequency graph does a good job breaking down a continuous variable by a categ
 
 ```
 
-*Boxplots* are a type of visual shorthand for distribution. The box stretches from the 25th percentile to the 75th percetile of the distribution (so the middle 50% of all observations, also known as the interquartile range). In the middle of the box is a line that shows the *median* value in the observations. Together, these help show the spread of the distribution, if it is symmetric around the median, and if it is skewed in one direction or the other. 
+**Boxplots** are a type of visual shorthand for distribution. The box stretches from the 25th percentile to the 75th percetile of the distribution (so the middle 50% of all observations, also known as the interquartile range). In the middle of the box is a line that shows the **median** value in the observations. Together, these help show the spread of the distribution, if it is symmetric around the median, and if it is skewed in one direction or the other. 
 
 Outliers that are 1.5 times the IQR are plotted individually.
 
