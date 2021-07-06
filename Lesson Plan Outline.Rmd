@@ -5,16 +5,35 @@ date: "5/5/2021"
 output: 
   html_document:
     toc: true
+    toc_float: true
     toc_depth: 2
-    toc float: true
-    theme: journal
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
+library(labelled)
+library(kableExtra)
+library(readxl)
+library(psych)
+library(survey)
+library(srvyr)
+library(scales)
+
+source("anes_functions.R", local = knitr::knit_global())
+source("anes_recodes.R", local = knitr::knit_global())
+
 ```
+# Survey Data Prep
+```{r, include=FALSE}
+anes <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/anes_timeseries_2020_stata_20210324.dta")
+#anes <- anes %>% all_recodes()
+
+#ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes_timeseries_2020_stata_20210324.dta", col_select = c( V201001:V201006, V201019:V201629e, V201639: V201652))
+
+```
+
 # Readings and Resources 
 
 Introductory Statistics with R - Peter Dalgaard (2002)
@@ -71,8 +90,6 @@ Findings show that water usage is highest for wealthy neighborhoods with large p
 Expenditures
 
 ```{r}
-# library("ggplot2")
-# library("stringr")
 # TaxExpenditure <- data.frame(Expenditure.Type = c(factor("Industry & workforce", "Defence", 
 #                                                        "Social security & welfare",
 #                                                        "Community services & culture", 
@@ -114,22 +131,20 @@ Bimodal distriubtion: a set of observations where two values occur more than oft
 
 # Univariate Data
 Univariate data involves analyzing one variable. It does not deal with causal relationships and it is mostly used to describe the variable. 
-```{r, include=FALSE}
-ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/anes_timeseries_2020_stata_20210324.dta")
-#ANES2020 <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_R/anes_timeseries_2020_stata_20210324.dta", col_select = c( V201001:V201006, V201019:V201629e, V201639: V201652))
-
-```
 
 ## Categorical Data
 
-A categorical variable is made of categories. Even if a number is assigned to it for coding purposes, the numbers do not mean anything. (eg. taking the average of: 1. Blue, 2. Orange, 3. Green)
+A categorical variable can only take on a specific set of values representing a set of possible categories. Even if a number is assigned to it for data recording purposes, the numbers do not mean anything (eg. taking the average of: 1. Blue, 2. Orange, 3. Green). This occurs most often when analyzing survey data when information is stored as numbered responses (that work for analysis) and labels (that describe the survey options). 
+
+Categorical variables are also called _nominal_ variables
+
 ```{r}
 # good vs bad examples. Link images.
-#table(ANES2020$V201429)
+
+#quicktab(anes$V201429)
+#table(anes$V201429)
 
 #V202118 # How does the respondent normally vote?
-
-
 ```
 Mode, Expected Value (don't cover?), Bar charts, Line charts (avoid pie charts)
 
@@ -137,6 +152,41 @@ Mode, Expected Value (don't cover?), Bar charts, Line charts (avoid pie charts)
 ## Numerical Data
 ```{r}
 # good vs bad examples. Link images.
+```
+### Continuous Variables
+
+Data that can take on any value in an interval
+Ex. Age of respondents
+```{r}
+# ANES 2020 Respondent Age
+source("anes_functions.R", local = knitr::knit_global())
+source("anes_recodes.R", local = knitr::knit_global())
+
+
+attributes(anes$V201507x)
+
+#anes %>% quicktab(V201507x, "Age")
+
+#quicktab(anes$agecat, "Age")
+table(anes$agecat)
+
+```
+### Discrete
+Data can be only integer values, such as counts.
+```{r}
+# frequency table, number of people that responded. Can't be fraction. 
+```
+
+### Ordinal
+This is a type of categorical variable where the responses have a meaningful order. Age groups, income brackets, Likert scales (Strongly Dislike, Dislike, Neutral, Like, Strongly Like) are all ordinal variables. 
+
+These you must approach carefully when doing analysis. 
+```{r}
+# Income bracket with unequal bracket ranges. Don't just calculate the Average income bracket number. 
+```
+
+```{r}
+
 ```
 
 
@@ -204,8 +254,15 @@ How tightly clustered or spread out is your data?
 
 Variance,Deviations, Range, Percentile, Degrees of Freedom
 
-Variability: The sum of squared deviations from the mean divided by n-1, where n is the number of data values.
-Standard deviation: Square root of the variance.
+*Variation*: The tendency of variables to change from measurement to measurement
+- Each measurement includes a small amount of error
+- Visualize the distribution of a variables values to find patterns in variation
+  - Chicago  traffic speed example
+
+
+*Variability*: The sum of squared deviations from the mean divided by n-1, where n is the number of data values.
+
+*Standard deviation*: Square root of the variance.
 ```{r}
 # include images I made from 402 discussin standard deviation and variability
 ```
@@ -230,6 +287,16 @@ Bivariate data is used to find out if there is a relationship between two differ
 *Test of Association*: Used to test whether two variables are related to one another or not
 - Depends on the nature of the variables you are studying (nominal, ordinal, interval) and number of categories
 - Depends on the nature of the question you're answering (independence, agreement of coders, effect of an intervention, etc.) 
+
+### Patterns and Models
+
+- Could this pattenr happen by chance?
+- How do you describe the relationship implied by the pattern?
+- How strong is the relationship implied by the pattern?
+- What other variables might affect the relationship?
+- Does the relationship change if you look at individual subgroups of the data?
+
+"Variation creates uncertainty but covariation reduces it." - pg 106 
 
 ## Correlation 
 Correlation is the extent that two continuous (interval or ratio level) variables are related. A relationship exists when knowing the value of one variavble is useful for predicting the value of a second variable. 
@@ -258,7 +325,7 @@ for (i in 1: 100)
 
 ```{r}
 # income summary, ordinal
-head(ANES2020$V202468x )
+# head(ANES2020$V202468x )
 ```
 
 ### Pearson Correlation
@@ -299,10 +366,9 @@ head(ANES2020$V202468x )
 ### Change Over Time
 
 
-# Text Data
+# Cleaning Data
 
 ```{r}
-library(readxl)
 DisasterDeclarations <- read_xlsx("C:/Users/aleaw/OneDrive/Desktop/PhD Spring 2021/Project Data/DisasterDeclarationsSummaries.xlsx")
 
 
@@ -313,10 +379,12 @@ DisasterSummary<- DisasterDeclarations %>%
   group_by(fipsStateCode, fipsCountyCode, designatedArea, fyDeclared, incidentType) %>%
   summarize(declarations = n())
 
-write_csv(DisasterSummary, "C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Excel_Files/BrowardDisasters.csv")
+#write_csv(DisasterSummary, "C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Excel_Files/BrowardDisasters.csv")
+DisasterSummary %>% kable()
+```
 
 
-
+```{r}
 Claims <- read_csv("C:/Users/aleaw/OneDrive/Desktop/PhD Spring 2021/Project Data/SampleFiles/FEMAClaims.csv") 
 claimssummary <- Claims %>%
   select(countyCode, state, yearOfLoss)%>%
@@ -326,27 +394,39 @@ claimssummary <- Claims %>%
   summarize(claims = n()) 
 
 write_csv(claimssummary, "C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Excel_Files/BrowardInsuranceClaims.csv")
+claimssummary %>% kable()
+```
 
 
+```{r}
 disasterswide <-pivot_wider(DisasterSummary, 
                              names_from = c(fyDeclared),
                              names_sep = "_",
                              values_from = c(declarations)
                              )
-disasterswide
+disasterswide %>% kable()
+```
 
+
+```{r}
 disasterswide2 <- pivot_wider(DisasterSummary, 
                              names_from = c(incidentType),
                              names_glue = "{incidentType}_{.value}",
                              values_from = c(declarations)
                              )
-disasterswide2
+disasterswide2 %>% kable()
+```
 
+
+```{r}
 disasterswide3 <- pivot_wider(DisasterSummary, 
                              names_from = c(fyDeclared, incidentType),
                              values_from = c(declarations))
-disasterswide3
+disasterswide3 %>% kable()
+```
 
+
+```{r}
 disasterswide4 <-   DisasterDeclarations %>%
   select(femaDeclarationString:declarationTitle, fipsStateCode:declarationRequestNumber) %>%
   filter(state == "FL",
@@ -358,7 +438,7 @@ disasterswide4 <-   DisasterDeclarations %>%
                            #  names_glue = "{variable}_{.value}",
                              values_from = c(declarations)
                              )
-disasterswide4
+disasterswide4 %>% kable()
 ```
 
 ## Cleaning Text
@@ -367,6 +447,17 @@ disasterswide4
 - Other String Things  
 
 ### Pivot 
+
+Practice
+1. You want to merge the immigration and education datasets. You want to keep all matching rows.
+
+2. You want to merge the immigration and education datasets and keep as much information as possible from the largest dataset.
+
+3. You want to merge the datasets education and income and keep as much information as possible from both datasets.
+
+```{r}
+
+```
 
 ### Separate 
 
@@ -408,14 +499,555 @@ Create a "fill in the blank" version of the code for students:
 - Double axes with misleading scales
 
 ### Crime Data over time example
+
 What happened to the total population during the time period? 
 Did population grow at larger rate than the topic being studied? Has the 
 
 # Fun Stuff
+
 Mostly just showing what exists, can provide example code for a few topics
 - GIFs  
 - Maps  
 - Twitter Data / Scraping 
+
+# Intro to R - Objects, Vectors, etc.
+
+
+R is an open source software whose packages are developed by several individuals around the world. 
+
+There are some coordinated efforts (e.g., tidyverse) but, in general, distributed development means that uniform conventions are often not followed concerning function names, arguments, and documentation.
+
+This means that there are several ways to "code" in R and get to the same output. 
+
+## Objects
+
+**Objects** are repositories of information - numbers, text, images... Each object has a name and we can assign content to an object using **<-**. You can also use **=** but the arrow is generally preferred
+
+
+Let's create an object storing the number 2
+
+```{r }
+
+object1 <- 2
+
+#Now, let's create another object storing the number 3
+
+object2 <- 3
+
+```
+
+See what happens when we sum them
+
+```{r, tidy=TRUE}
+
+object1+object2
+
+# tidy = TRUE in the markdown file adds spaces to make the code "tidy" and easy to read
+```
+
+## Vectors
+
+An object that stores multiple pieces of information is called **vector**.
+
+**c** is the function that we use to **combine** multiple values into one object.
+
+*A function is a command that take an object and perform an operation*
+
+
+We can create an object called ob1 storing the following values: 1, 3, 4, 5, 5
+
+```{r }
+
+ob1 <- c(1, 3, 4, 5, 5)
+
+```
+
+To inspect an object, you can just type its name.
+
+```{r }
+
+ob1
+
+```
+
+I strongly encourage you to always inspect your objects, vectors, matrices... Checking on your objects helps catch mistakes early.
+
+
+
+### Object names
+
+- Object can have any name but you cannot use spaces in an object name (e.g., "Object A" -> "ObjectA")
+
+- You can use a dot or an underscore to separate words (underscore is preferred)
+
+- R is case sensitive: I suggest using lowercase as much as possible
+
+- **Always** give your objects a "good name"
+    - Intuitive / meaningful
+    - Concise / short    
+    - Easy to remember
+    - Unique (e.g., do not name an object as a variable or another object)
+    
+
+#### Some examples
+
+**Good names**
+- data_1
+- data_2 
+- crime_data
+
+**OK names**
+- data.1 (dot)
+- mydata (generic)
+
+**Bad names**
+- myfirstdata_nov222020 (too long)
+- my_very_first_ObjectInR (too complex)
+
+**Very bad names** 
+- dsafdsafadf_daada (meaningless)
+
+## Strings
+
+We can store multiple type of values into a vector, not just numbers.
+
+**Strings** (or characters) are pieces of text information which are stored into **""** 
+
+```{r }
+
+week_days <- c("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+
+week_days
+
+```
+
+## Class 
+
+To know the type of value stored into an object, we can use the command **class**. 
+
+```{r }
+
+
+```
+
+### Your turn!
+
+Create two objects, called "names" and "yob". 
+
+- names should be a string containing the following names: Mary, Mark, John, David, and Claudia
+
+
+- yob should be a numeric vector containing the following years of birth: 1990, 1987, 1980, 1985, 1993
+
+*Which is the class of each vector?*
+
+
+#### Solution
+
+```{r}
+
+names <- c("Mary", "Mark", "John", "David", "Claudia")
+
+yob <- c(1999, 1985, 1960, 1955, 1974)
+
+
+class(names)
+
+class(yob)
+
+```
+
+We now have two **vectors** containing multiple values. One vector is **character** and the other is **numeric**. 
+
+> Make sure to leave a space after each comma
+
+
+## Matrices
+
+Two or more vectors can be combined into a matrix. 
+
+In this case, we use either **rbind** or **cbind** to bind our data by row or column, respectively.
+
+
+```{r}
+cbind(names, yob)
+
+rbind(names, yob)
+```
+
+*What is the different between the two commands?*
+
+Let's use cbind to create a matrix to 'play' with. We call it data_1.
+
+```{r }
+
+data_1 <- cbind(names, yob)
+
+class(data_1)
+
+```
+
+
+### Matrix dimensions
+
+Matrices are made of rows and columns. You can check how many rows or columns at any time using the following commands:
+
+```{r } 
+
+nrow(data_1)
+
+ncol(data_1)
+
+dim(data_1)
+
+
+```
+
+>**Important**: R always stores information in the **row-column** format
+
+These commands should be the first one you use when opening a dataset in R - check if it is loaded correctly + data size should match your expectations (e.g., if a dataset is at the state level, it should have 50 observations)
+
+
+
+### Matrix positions
+
+Like in battleship, we can identify information contained in a matrix by their row-column position
+
+```{r }
+
+# Position: row 2, column 2
+
+data_1[2, 2]
+
+# Position: row 5, column 1
+
+data_1[5, 1]
+
+```
+
+*What happens if you omit the column or the row number? E.g., data_1[2, ]?*
+
+
+## Numerical indexing
+
+```{r }
+
+# No column is specified
+
+data_1[2, ]
+
+```
+
+```{r }
+
+# No row is specified
+
+data_1[, 2]
+
+```
+
+We can use [] to subset an object
+
+```{r }
+
+data_1[, 2]
+
+
+```
+
+We can save the new subset in a new object
+
+```{r }
+
+data_1_subset = data_1[, 2]
+
+data_1_subset
+
+```
+
+## Dataframes
+
+We will rarely work with matrices. In most cases, we will use dataframes. A **dataframe** is a dataset in R. We can convert any object into a dataframe
+
+```{r }
+
+data_df <- as.data.frame(data_1)
+
+class(data_df) 
+
+class(data_1)
+
+data_df
+
+```
+Note that we can use the same commands as before to check the dimension of the dataframe
+
+```{r }
+
+ncol(data_df)
+
+nrow(data_df)
+
+dim(data_df)
+
+```
+
+Dataframes have special properties. For instance, they have column and row names
+
+```{r }
+
+colnames(data_df)
+
+rownames(data_df)
+
+```
+
+
+
+### Columns
+
+Since columns have names, we can call each column using the symbol **$**
+
+```{r }
+
+data_df$names
+
+data_df$yob
+
+```
+
+Important: You always need to call both the dataset and the column name
+
+*datasetName$ColumnName*
+
+We can perform any operation on columns. Let's try with checking the class of those columns.
+
+
+```{r }
+
+class(data_df$names)
+
+class(data_df$yob)
+
+```
+
+
+## What is a factor?
+
+Special class of vectors for categorical variables. Factors are composed by levels (a.k.a., categories). R uses factors to represent categorical variables that have a known set of possible values.
+
+- **factor:** dog, cat, cat, dog, bird, dog
+- **levels:** dog, cat, bird
+
+```{r }
+data_df$yob
+```
+
+
+## Converting class
+
+You can always convert any vector (or column or row) from one class to the other 
+
+- **as.**numeric
+- **as.**character
+- **as.**factor
+- **as.**matrix
+- **as.**data.frame
+
+#### Your turn!
+
+Convert the names column from factor to character (save it as a new column)
+
+data_df$names2 <- as.character( ................ )
+
+Check the class of the new and old column
+
+Convert the yob column from factor to numeric (save it as a new column)
+
+
+#### Solutions
+
+```{r }
+
+data_df$names_R <- as.character(data_df$names)
+
+class(data_df$names_R)
+
+data_df$names
+
+data_df$names_R
+
+```
+Note: When you recode a variable, it's good practice to save it as a new one. 
+
+- It allows you to check your work 
+
+- You might need to go back to the original variable
+
+- If you make a mistake, you don't have to upload your dataset again
+
+- You can always clean your dataframe at the end (e.g., keep only relevant columns)
+
+```{r }
+
+data_df$yob_R = as.numeric(data_df$yob)
+
+class(data_df$yob_R)
+
+data_df$yob_R
+
+data_df$yob
+
+```
+
+*What happened?* 
+
+### From factor to numeric
+
+By using as.numeric, the new vector stores the # of the level but not their content. 
+
+- **factor:** dog, cat, cat, dog, bird, dog
+- **levels:** dog, cat, bird
+- **level numbers:** 1, 2, 3
+
+```{r }
+
+data_df$yob
+
+data_df$yob_R
+
+```
+We need to convert into numeric each level of the vector
+
+```{r }
+
+data_df$yob_R2 <- as.numeric(levels(data_df$yob))[data_df$yob]
+
+class(data_df$yob_R2)
+
+data_df$yob_R2
+
+```
+
+### Summary of Class types
+
+**Class**    | **Description**                          | 
+-------------| -----------------------------------------|
+character    |It stores text information. 
+numeric      |It stores numbers (continuous variables)
+factors      |It stores categorical variables
+levels       |It stores each category of a factor
+
+
+
+## Operations with column
+
+You can manipulate columns in the same way you would with vectors (mostly). 
+
+For instance, we can create a new column called **age** where we calculate the age for each individuals in the current year.
+
+```{r }
+
+data_df$age <- 2021 - data_df$yob_R2
+
+data_df$age
+
+```
+
+You can also decide to calculate the age in terms of months instead of years
+
+```{r }
+
+data_df_agemonths <- data_df$age * 12
+
+```
+
+In sum, you can easily perform operations with your columns.
+
+## Functions
+
+When learning about a new function, you generally want to retrieve three pieces of information:
+
+- **Description** wthat the function does
+
+- **Usage** how you are expected to write the function
+
+- **Arguments** what each part of the function does.
+
+All help pages also contain an **"examples"** section where you can see how the function is used in practice.
+
+Even when you discover new functions from other sources, you should check out the help page to understand all possible options provided by the arguments. 
+
+Let's use some descriptive statistics functions to check out the variable *age*. 
+
+```{r, eval = F}
+
+table(data_df$age) # Frequencies
+
+mean(data_df$age) # Mean value
+
+min(data_df$age) # Minimum value
+
+max(data_df$age) # Maximum value
+
+sd(data_df$age) # Standard deviation
+
+median(data_df$age) # Median value
+
+quantile(data, 0.25) # Quantile
+
+```
+
+## Logical indexing
+
+It is possible that you might want to know the average income of only those individuals who were born before 1980. 
+
+We can use [] to subset our dataframe. 
+
+We are asking R to subset *data_df* and keep only those rows that have a value lower than 1980 in the column *yob_R2*. We are keeping all columns in the dataset as we are not specifying any columns after the comma.
+
+```{r }
+
+data_df[data_df$yob_R2 < 1980, ]
+
+```
+
+We could save it as a separate dataframe
+
+```{r }
+
+data_df2 <- data_df[data_df$yob_R2 < 1980, ]
+
+data_df2
+
+```
+
+We can use logical indexing to perform operations on a subset of observations. Try to calculate the mean age for those individuals born before 1980 (start with code to calculate the mean age for everyone and modify it).
+
+
+```{r }
+mean(data_df$age[data_df$yob_R2 < 1980])
+
+mean(data_df$age[data_df$yob_R2 <= 1980])
+```
+
+Now calculate the mean age for those called "Mary". Note that equal is represented by the symbol **==** when used for logical indexing.
+
+```{r}
+mean(data_df$age[data_df$names == "Mary"])
+```
+
+### Recap
+
+Terminology used in this class provides you the basics to talk about R concepts and elements (vectors, objects, functions...)
+
+'dollar sign' syntax is so called because of the use of **$** to connect a dataframe name with a column name.
+
+Dataframes are a very common way to work with data in R. Some functions do not work with tibbles (tidyverse database format) so you'll likely go back to this at one point (e.g., regression analysis classes)
+
+Tidyverse is better for data wrangling and visualization. 
+
+
 
 
 # Excel v R commands
@@ -430,6 +1062,273 @@ Save and SaveAs is write_csv()
 
 MAX(), MIN(), AVERAGE(), COUNT()  STDEV.S() for samples & STDEV.P() for populations
 MAX() - MIN() gives you the range
+
+
+## Visualizing Distributions
+```{r}
+diamonds # default dataset included in package
+```
+```{r}
+diamonds %>% count(cut) #categorical & ordinal
+ggplot(diamonds)+
+  geom_bar(aes(cut))
+```
+Continuous variable,can take any of an infinite set of ordered values. Numbers and date-times are examples of continuous variables. 
+```{r}
+
+ggplot(diamonds) +
+  geom_histogram(aes(carat), binwidth = 0.5)
+```
+*Typical Values* are the common values of a variable.
+- Tall bars show common values
+- shorter bars show less-common values
+
+1. Which values are the most common?
+2. Which values are rare? Is this match your expectations?
+3. Any unusual patterns? If yes, what might explain them?
+
+   - Source: Chapter 5: Exploratory Data Analysis pg 88
+   
+*Unusual Values* are observations that do not seem to fit the pattern, also called outliers. These can occur from data entry errors or may be from interesting points of study.
+
+```{r}
+ggplot(diamonds) +
+  geom_histogram(aes(x=y), binwidth = 0.5)
+```
+It is hard to see the outlier here. The only hint is that the y axis is so wide. This indicates that somewhere around 60, there is an observation of that value, otherwise it would not have been included automatically in the graph. If we want to "zoom in" to see the unusual values, you can add another line of code:
+```{r}
+ggplot(diamonds) +
+  geom_histogram(aes(x=y), binwidth = 0.5) + 
+  coord_cartesian(ylim = c(0,50))
+```
+If you want want to zoom in on the x-axis, there is also an xlim() argument. If we want to visualize or analyze the data without the outliers, we can filter() them out using *dplyr*.
+```{r}
+obs <- diamonds %>%
+  filter(y > 3 & y < 20)  %>%
+  arrange(y)
+ggplot(obs) +
+  geom_histogram(aes(x=y), binwidth = 0.5)
+```
+If we want to examine the outliers closely, we can also use filter to achieve our goals. Outliers are not necessarily a mistake or a bad thing. Many case studies are intensive research on only outliers. (Much of the work I do involves looking at outliers)
+```{r}
+outliers <- diamonds %>%
+  filter(y < 3 | y > 20)  %>%
+  arrange(y)
+outliers
+```
+*Missing Values* 
+
+
+```{r}
+# is.na() # 
+
+# ifelse(diamonds %>% mutate( y = ifelse( y < 3 | y > 20, NA, y)))
+# if y is less than 3 or greater than 2, change y to a missing value, otherwise leave it alone
+```
+
+*Covariation* is when variation describes the behavior _between_ variables (Reminder: variation describes behavior _within_ a singular variable). The easiest way to spot covariation is to visualize the relationship between the two variables. Depending on the types of variables determines the best ways to visualize the relationships.
+
+Categorical & Continuous Variables
+A frequency graph does a good job breaking down a continuous variable by a categorical variable. Histograms and vertical or horizontal bar graphs
+```{r}
+
+```
+
+*Boxplots* are a type of visual shorthand for distribution. The box stretches from the 25th percentile to the 75th percetile of the distribution (so the middle 50% of all observations, also known as the interquartile range). In the middle of the box is a line that shows the *median* value in the observations. Together, these help show the spread of the distribution, if it is symmetric around the median, and if it is skewed in one direction or the other. 
+
+Outliers that are 1.5 times the IQR are plotted individually.
+
+A line (or a _whisker_) extends from the ends of the box to the farthest nonoutlier point in the distribution. 
+```{r}
+ggplot(data = mpg) + 
+  geom_boxplot(
+  mapping = aes(class, y = hwy)
+)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_boxplot(
+  mapping = aes(x = reorder( class, hwy, FUN = median), y = hwy)
+) + coord_flip()
+```
+*Two Categorical Variables*
+Covariation between categorical variables is os visualized by examing the number of observations for each combination.
+
+```{r}
+ggplot(diamonds) +
+  geom_count(mapping = aes(x=cut, y = color))
+```
+```{r}
+diamonds %>% count(color, cut) %>%
+  ggplot(aes(color, cut)) + 
+  geom_tile(aes(fill = n))
+```
+
+*Two Continuous Variables*
+Scatterplot with geom_point()
+```{r}
+ggplot(diamonds) +
+  geom_point(aes(carat, price),
+             alpha = .01) # adds transparency
+```
+
+
+# Codeing Etiquette 
+
+## Comments
+
+You can leave comments in between pieces of code. This will be particularly help when we get to graphs.
+
+```{r eval = F}
+
+# Create a pie chart graph representing the activities done in reality.
+
+reality <- 
+  # Call the dataset that I want to use "lockdown_reality"
+  ggplot(lockdown_reality, 
+  # This section seems to create the basic pie chart graph by setting key parameters
+  # fill represents the size of the pie slices
+  aes( x = "", y = reality_timespent, fill = reality_activities)) + 
+  geom_bar( stat = "identity", color = "red", size = 2) +
+  coord_polar( "y", start = 0 ) +
+  theme_void() +
+  theme(
+        # Create a legent and put it at the bottom
+        legend.position = "bottom", 
+        # Eliminate title? 
+        legend.title = element_blank(), 
+        legend.direction = "horizontal", 
+        plot.title = element_text(hjust = 0.5, size=22, face="bold", color="red"))+
+  scale_fill_brewer(palette="Dark2") +
+  ggtitle("Reality")
+```
+
+_Why so much emphasis on code??_
+
+1. You need to make your code reproducible by others. This means explaining to them (and your future self) what you did at each stage and how the code words.
+
+  - Trust me, you are going to forget
+
+  - Your colleagues will very much appreciate this!
+
+2. This is a way of leanring by noting down stuff that you notice and think about them. It will also help identifying parts that you don't understand about your code and ask questions!
+
+
+### Nice and ugly codes
+
+Writing "nice" codes is about: 
+
+* Always leave a space before and after a symbol
+
+**Ugly codes**
+
+```{r eval=F}
+
+2*3 
+
+object1<-2
+
+```
+
+**Nice codes**
+```{r , eval = F}
+
+2 * 3 
+
+object1 <- 2
+
+```
+
+* This rule applies to commas as well
+* BUT we don't leave spaces before and after parantheses
+
+**Ugly codes**
+
+```{r eval = F}
+
+object1<-c(9,3,4,1)
+
+object1 <- c ( 9,3,4,1 )
+
+```
+
+**Nice codes**
+```{r , eval = F}
+
+object1 <- c(9,3,4,1)
+
+#Even more correct:
+object1 <- c(9, 3, 4, 1)
+
+```
+
+Keep noticing this as we move forward and get yourself used to write nice codes since the very beginning: habits are difficult to change!
+
+Note: When you recode a variable, it's good practice to save it as a new one. 
+
+- It allows you to check your work 
+
+- You might need to go back to the original variable
+
+- If you make a mistake, you don't have to upload your dataset again
+
+- You can always clean your dataframe at the end (e.g., keep only relevant columns)
+
+
+### Quick exercise
+
+```{r eval = F}
+lockdown_exp<-as.data.frame(cbind(exp_activities,exp_timespent))
+lockdown_exp
+
+lockdown_reality<-as.data.frame(cbind(reality_activities,reality_timespent))
+lockdown_reality
+
+library("ggplot2")
+full_plot<-plot_grid(Planned,Happened,
+                     align="h",
+                     labels="Planned VS Happened During the Lockdown",
+                     label_size=27,
+                     label_fontface="plain",
+                     label_colour="black",
+                     label_x=-0.47,label_y=0.95)
+```
+
+### Example
+
+**1) Create a vector storing the following values: 3,2,1,4,1 representing the number of hours Mary watched TV this week. Name it appropriately**
+
+**2) Calculate the average number of hours that Mary watched TV**
+
+
+### ggplot2 Calls
+
+Line of code where each argument is specified:
+```{r}
+ggplot(data = faithful, mapping = aes(x = eruptions)) +
+  geom_freqpoly(binwidth = 0.25)
+```
+Line of code without each argument specified:
+```{r}
+ggplot(faithful, aes(eruptions)) +
+  geom_freqpoly(binwidth = 0.25)
+```
+Including the arguments can be very helpful for your future self or if you are sharing your code with other people. Inclusion of the argument  and clean, readable code can help you find mistakes faster and collaborate easier. 
+
+```{r eval= F}
+# Create vector storing the number of TV hours watched
+tv_hours <- c(3, 2, 1, 4, 1)
+
+# Calculate the average number of TV hours watched
+mean(tv_hours)
+
+# 1. The average number of hours is 2.2
+
+```
+
+
+R is an open source software whose packages are developed by several individuals around the world. This means that there are several ways to "code" in R and get to the same output. 
 
 
 # Tips for myself later
