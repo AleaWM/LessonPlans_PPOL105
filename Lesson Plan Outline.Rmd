@@ -147,6 +147,11 @@ Categorical variables are also called _nominal_ variables
 #V202118 # How does the respondent normally vote?
 ```
 Frequencies, proportions, bar charts
+```{r}
+# devtools::install_github("AleaWM/cuppackage")
+library(cuppackage)
+broward # works!!!!!! 
+```
 
 
 ## Numerical Data
