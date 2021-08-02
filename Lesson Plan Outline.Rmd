@@ -20,9 +20,10 @@ library(psych)
 library(survey)
 library(srvyr)
 library(scales)
+library(cuppackage)
 
-source("anes_functions.R", local = knitr::knit_global())
-source("anes_recodes.R", local = knitr::knit_global())
+# source("anes_functions.R", local = knitr::knit_global())
+# source("anes_recodes.R", local = knitr::knit_global())
 
 ```
 # Survey Data Prep
@@ -90,7 +91,7 @@ Findings show that water usage is highest for wealthy neighborhoods with large p
 Expenditures
 
 ```{r}
-# TaxExpenditure <- data.frame(Expenditure.Type = c(factor("Industry & workforce", "Defence", 
+# TaxExpenditure <- data.frame(Expenditure.Type = c(factor("Industry & workforce", "Defense", 
 #                                                        "Social security & welfare",
 #                                                        "Community services & culture", 
 #                                                        "Health", 
@@ -140,7 +141,8 @@ Categorical variables are also called _nominal_ variables
 
 ```{r}
 # good vs bad examples. Link images.
-
+table(broward$incidentType)
+ 
 #quicktab(anes$V201429)
 #table(anes$V201429)
 
@@ -148,13 +150,13 @@ Categorical variables are also called _nominal_ variables
 ```
 Frequencies, proportions, bar charts
 ```{r}
-# devtools::install_github("AleaWM/cuppackage")
-library(cuppackage)
 broward # works!!!!!! 
 ```
 
 
 ## Numerical Data
+
+<https://github.com/allisonhorst/stats-illustrations/raw/master/other-stats-artwork/nominal_ordinal_binary.png>
 ```{r}
 # good vs bad examples. Link images.
 ```
@@ -180,6 +182,8 @@ table(anes$agecat)
 
 ### Discrete
 Data can be only integer values, such as counts.
+<https://github.com/allisonhorst/stats-illustrations/blob/master/other-stats-artwork/continuous_discrete.png>
+
 ```{r}
 # frequency table, number of people that responded. Can't be fraction. 
 ```
@@ -189,7 +193,8 @@ This is a type of categorical variable where the responses have a meaningful ord
 
 These you must approach carefully when doing analysis. 
 ```{r}
-# Income bracket with unequal bracket ranges. Don't just calculate the Average income bracket number. 
+# Income bracket with unequal bracket ranges. Don't just calculate the Average income bracket number.
+
 ```
 
 ```{r}
@@ -232,6 +237,8 @@ Calculate the mean
 ```{r}
 # link generic forumla for equation or type it in
 #mean()
+
+# summarize using mean example
 ```
 
 Discussion on outliers, potential use of trim mean
@@ -353,7 +360,9 @@ for (i in 1: 100)
 ### Scatterplots
 ```{r}
 # ggplot() + geom_point()
-# ggscatter 
+# ggscatter
+
+ 
 ```
 
 ## Two-Way Tables
@@ -994,6 +1003,8 @@ Tidyverse is better for data wrangling and visualization.
 
 # Excel v R commands
 
+In excel, we made pivot tables and pivot charts. Do you remember how many clicks it took to get what you wanted? Image trying to tell someone how to replicate a fancy graph in Excel? In R, we can make the tables and charts with code that anyone can use to recreate your images. It also makes it MUCH easier for you to change your variables and change small aspects of your tables/charts without having to click through a lot of settings and options. 
+
 ## Descriptive Statistics
 
 CORREL() and PEARSON() are the same in excel
@@ -1277,6 +1288,7 @@ R is an open source software whose packages are developed by several individuals
 
 # Tips for myself later
 
+[Dates and times infographic]<https://github.com/rstudio/concept-maps/raw/master/inspirations/datetime-silvia-canelon.png>
 
 If needed, you can also set text into your inline codes simply using the format **``` `mean(XXX)` ```**. 
 
@@ -1302,4 +1314,55 @@ Function | When to use it
 **fct_reorder():** | Reorder factor levels by sorting along another variable (great fro cat-cont graphs)
 **fct_reorder2():** |Reorder factor levels by sorting along 2 other variables
 ------------------------------------
+
+
+
+
+# Animations
+
+```{r}
+# Get data:
+library(gapminder)
+ 
+# Charge libraries:
+library(ggplot2)
+library(gganimate)
+ 
+# Make a ggplot, but add frame=year: one image per year
+ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, color = continent)) +
+  geom_point() +
+  scale_x_log10() +
+  theme_bw() +
+  # gganimate specific bits:
+  labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
+  transition_time(year) +
+  ease_aes('linear')
+
+# Save at gif:
+anim_save("271-ggplot2-animated-gif-chart-with-gganimate1.gif")
+```
+
+```{r}
+# Get data:
+library(gapminder)
+ 
+# Charge libraries:
+library(ggplot2)
+library(gganimate)
+ 
+# Make a ggplot, but add frame=year: one image per year
+ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, colour = country)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = country_colors) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(~continent) +
+  # Here comes the gganimate specific bits
+  labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
+  transition_time(year) +
+  ease_aes('linear')
+
+# Save at gif:
+anim_save("271-ggplot2-animated-gif-chart-with-gganimate2.gif")
+```
 
