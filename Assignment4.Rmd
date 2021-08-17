@@ -1,0 +1,153 @@
+---
+title: "Assignment 4"
+author: "Alea Wilbur"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Source[Teacup Giraffes](https://tinystats.github.io/teacups-giraffes-and-statistics/02_bellCurve.html)
+
+```{r make data, echo=FALSE}
+set.seed(12)
+x <- rnorm(50, 10, 2)
+x2 <- rnorm(50, 18, 1.2)
+x <- data.frame(x=x, type="Island #1")
+x2 <- data.frame(x=x2, type="Island #2")
+d <- rbind(x,x2)
+colnames(d) <- c("Height", "Location")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+# Making a histogram with `ggplot2`
+
+We will use the *ggplot2* package for all our graphing. Check out [this page](https://ggplot2.tidyverse.org/reference) as a reference. 
+
+We need some basic components as a bare minimum to get started. We can customize components later to make the graph more to our liking. The steps we will go through are:
+
+  * First we need to tell R that we want to create a ggplot. This is done by **using the `ggplot( )` function**. Within the parentheses, we can specify the data frame that contains what we want to plot, using the option `data = d`. We also have to tell ggplot *what* columns of the data frame to actually plot-- we do this with the argument that stands for aesthetics: `aes( )`. In our case, only the x-axis variable `Height` needs to be specified.
+
+  * Next, **add a `geom` layer**, which will determine the type of visual representation that will be used for the data. Different ggplot layers and options are added using a plus sign `+`. In our case, we will write `+` and then `geom_histogram( )`. To make your plot look similar to your sand drawing, you want to add an optional argument within the parentheses of `geom_histogram`, which will set the bin width to 1cm: `geom_histogram( binwidth = 1 )`.
+
+Here we are using `geom_histogram`, but there are many other `geom_` layers that you could use instead for different plot types. Check some of them out [here](https://ggplot2.tidyverse.org/reference/#section-layer-geoms).
+
+A note about the `+`: You can keep adding new specifications on one long continuous line of code, separating each one with a `+`.  However, if you'd like to make the code easier to read by adding each specification to a new line, make sure the `+` is added to the end of the first line and not the new one.
+
+It's a good idea to save any ggplot you make as an object. It's a helpful practice for when you'll do more complicated graphing later (e.g. combining plots).
+
+
+```{r}
+# Create a histogram using the instructions above
+
+p <- ggplot(data = d, aes(x = Height)) + 
+  geom_histogram(binwidth=1)
+
+p
+```
+ Customize your ggplot
+
+Let's go over some quick ways we can customize any ggplot. First, we can tell ggplot that we want the data from the two islands to be different colors. And second, we can to specify the colors we want to use. 
+
+**Different color for each group:** Within `aes( )`, we add a `fill = ` argument. Here is where you put the name of the variable that contains the categories that you want to distinguish with different colors. 
+
+You might be wondering why we don't use the `color= ` here instead (which is a valid argument for `aes( )`), and this is because we want to change the color of the *fill* of the bars, while `color = ` would change only the bar outline color (see below).
+
+To choose colors ggplot should use, we need to add a new option ` + scale_fill_manual( )` and then specify the colors with the argument `values = `. To read more about how to create your own color scale, see this [page](https://ggplot2.tidyverse.org/reference/scale_manual.html). If you have more than one color you need to specify, make sure you combine them within the `c( )` function. 
+
+Colors in R can be specified in different ways. For example, you can use a string of the color name (see possible colors [here](http://sape.inf.usi.ch/quick-reference/ggplot2/colour)) or with [hex color codes](https://htmlcolorcodes.com/).
+
+**Outline Color:** To change the color of the outline, specify `color = ` within the parentheses of the `geom_` (i.e. `geom_histogram`). 
+
+## Use the descriptions above to:
+
+ * Specify the variable that `fill` should be set to, as well as the colors for the fill and outline.
+ * Try out some color specifications on your own, and then check out the solution to see what we picked.
+```{r}
+#Fill in the incomplete arguments below
+
+# p <- ggplot(data = d, aes(x = Height, fill = ______)) +
+#   geom_histogram(binwidth = 1, color = _____) +
+#   scale_fill_manual(values = c(______))
+#   
+# p
+```
+
+**Playing around with "complete themes": ** ggplot has a nice way of changing many non-data display parameters at once though what is referred to as "complete themes". Check this [page](https://ggplot2.tidyverse.org/reference/ggtheme.html) for the available options.
+
+ * Have fun testing out a few different complete themes by adding the argument with a `+` sign. 
+ * Try 3 different complete themes and take note of how the plot changes.
+```{r}
+# Add a complete theme to existing code
+
+p <- ggplot(data = d, aes(x = Height, fill = Location)) +
+  geom_histogram(binwidth = 1, color = "white") +
+  scale_fill_manual(values = c("green3", "turquoise3"))
+
+p
+```
+
+
+(1) **Remove the space between the bars and the x-axis**: Use the `scale_y_continuous()` argument, and inside the parentheses specify `expand = ` followed by two numbers within the `c( )` command. These two numbers represent how much above or below the data's range you would like to extend the y-axis by. 
+
+The function `scale_y_continuous` can be used for other purposes. See some examples and more documentation can be found [here](https://ggplot2.tidyverse.org/reference/scale_continuous.html).
+
+ * Set axis limits
+ * Set axis breaks 
+ * Transformations
+```{r}
+
+```
+
+(2) **Change axes labels**: Add `labs( )` to the existing ggplot layers and specify each axis you'd like to label as arguments, e.g. `x = `, followed by the string for your label. If you'd like to learn more about manipulations you can do with `labs( )`, see [this reference](https://ggplot2.tidyverse.org/reference/labs.html). 
+
+(3) In addition, `labs( )` can be used to **remove labels**. In this case, we can also include `fill = NULL` to remove the legend label (recall that the categories for our legend were determined by the `fill` argument in `aes()` previously).
+
+Use the window below to:
+
+ * Remove the space and legend label
+ * Change the x-axis label to "Teacup Giraffe heights" and the y-axis label to "Frequency".
+```{r}
+
+```
+ 
+ (4) **Remove panel border** and 5.**Remove minor grid lines**: To make detailed changes to the layout, we can add a `theme( )` argument. Nested within `theme( )` we can use additional arguments, such as `panel.border= ` and `panel.grid.minor= `. Many `theme( )` arguments can be set to `element_blank( )` to remove the element in question. To read more about what can be modifed with `theme( )`, check out this [resource](https://ggplot2.tidyverse.org/reference/theme.html).
+
+ * In the window below, use what you just learned to remove the panel border and the minor grid lines of the plot. 
+```{r}
+ # Remove panel border and minor grid lines
+
+p <- ggplot(data = d, aes(x = Height, fill = Location)) +
+  geom_histogram(binwidth = 1, color = "white") +
+  scale_fill_manual(values = c("green3", "turquoise3")) + 
+  theme_light() +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x="Teacup Giraffe heights", y="Frequency", fill=NULL) +
+  theme()
+
+p
+```
+
+
+(6) **Move the Legend**: We will add two more arguments to `theme( )` to move the legend and make its background transparent. To change its position, use `legend.position = ` followed by the `c( )` command, in which you will specify the x- and y- positions. These values must be between 0 and 1. Specifying `c(0,0)`, for example, would place the legend at the bottom left of the plot, while `c(1,1)` would place it at the top right.  
+
+To change the legend background to be transparent, we essentially remove it. Add the argument `legend.background =`. Take a look at previous steps to determine how you remove an element.  
+```{r}
+# Move legend
+
+p <- ggplot(data = d, aes(x = Height, fill = Location)) +
+  geom_histogram(binwidth = 1, color = "white") +
+  scale_fill_manual(values = c("green3", "turquoise3")) + 
+  theme_light() +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x="Teacup Giraffe heights", y="Frequency", fill=NULL) +
+  theme(panel.border=element_blank(), panel.grid.minor=element_blank(), legend.position = , legend.background = )
+
+p
+```
+

@@ -1,0 +1,315 @@
+---
+title: "Crashes & COVID19"
+author: "Alea Wilbur"
+date: "3/1/2021"
+output: html_document
+runtime: shiny
+---
+
+# Setup
+```{r setup, include = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+library(tidyverse)
+library(lubridate) 
+library(plotly)
+library(sf)
+library(leaflet) 
+library(tmap)
+library(highcharter) 
+library(ggsci)
+library(kableExtra) # make your charts pretty
+#devtools::install_github("covid19R/covid19nytimes") 
+library(covid19nytimes)
+library(RSocrata)
+
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+#crash <- read_csv("~/GitHub/PPOL105/Traffic_Crashes_Cleaned.csv")
+
+# crashes <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/Original Datasets_Dont Touch/Traffic_Crashes_Orig.csv")
+
+```
+
+```{r, echo = FALSE}
+# works but saving and reading in as CSV to speed up document creation
+crashes <- read.socrata("https://data.cityofchicago.org/resource/85ca-t3if.csv?$where=CRASH_DATE > '2019-01-01T00:00:01'",
+                    app_token = "NLJIazfKKzk71gTZXgyJ17H8N",
+                    email     = "awilbu2@uic.edu",
+                    password  = "Supersoup!55")
+
+
+# API KEY ID
+# 7wozsduhlxqle390n4kjkd7a5
+
+# API Key Secret
+# 49p2nh9108wuuine4z720roen4x6yyd2wd5wtn8qdennfrsksb
+```
+
+# Chicago Crash Data
+This [link](https://rpubs.com/camilovelezr/tcc) has done most of the work for crashes
+
+
+Get rid of extra variables. Originally had 49, now it will have 29.
+```{r}
+ crash <- crashes %>% 
+  rename_with(str_to_upper) %>% # original code was in all caps and I'm lazy
+  select(-c('CRASH_RECORD_ID', 'CRASH_DATE_EST_I', 'TRAFFIC_CONTROL_DEVICE', 'DEVICE_CONDITION', 'LANE_CNT', 'ALIGNMENT', 'ROAD_DEFECT', 'REPORT_TYPE', 'INTERSECTION_RELATED_I', 'PRIVATE_PROPERTY_I','HIT_AND_RUN_I', 'DATE_POLICE_NOTIFIED', 'PHOTOS_TAKEN_I', 'STATEMENTS_TAKEN_I', 'DOORING_I', 'NUM_UNITS', 'INJURIES_INCAPACITATING', 'INJURIES_NON_INCAPACITATING', 'INJURIES_REPORTED_NOT_EVIDENT', 'INJURIES_UNKNOWN')) 
+
+
+
+crash$CRASH_DATE <- ymd_hms(crash$CRASH_DATE)  # tells R that date is in month/day/year and hour:minute:second formatting
+
+crash$CRASH_DATE <- as_date(crash$CRASH_DATE) # Remove hours, I did this in excel already for the cleaned version. 
+# Time also exists already in another column
+# Date is in year/month/day format.
+```
+
+
+```{r}
+# if you read in the data from the original csv and clean the dates, then you will get March 3 2013
+#min(crash$CRASH_DATE) # March 3rd, 2013
+
+# if using original csv, then select for all dates after Jan. 1 2019
+# this was already done using the API
+# crash <- crash %>%
+ # filter(CRASH_DATE >= (mdy("1/1/2019"))) # 222,717 observations remaining
+
+min(crash$CRASH_DATE) # January 1, 2019
+```
+So far, so good!
+
+```{r}
+# data %>%
+#   mutate(educcat_F = fct_recode(educcat_F, #<<
+#                                 "1" = "Less Than High School", #<<
+#                                 "2" = "High School", #<<
+#                                 "3" = "Junior College",#<<
+#                                 "4" = "Bachelor", #<<
+#                                 "5" = "Graduate")) %>% #<<
+#   group_by(educcat_F) %>%
+#   summarize(count = n())
+class(crash$POSTED_SPEED_LIMIT)
+# crash <- crash %>% mutate(POSTED_SPEED_LIMIT = case_when(
+#   POSTED_SPEED_LIMIT == 1:7 ~ 5, 
+#   POSTED_SPEED_LIMIT == 8:12 ~ 10,
+#   POSTED_SPEED_LIMIT == 13:17 ~ 15, 
+#   POSTED_SPEED_LIMIT == 18:22 ~ 20, 
+#   POSTED_SPEED_LIMIT == 23:27 ~ 25,
+#   POSTED_SPEED_LIMIT == 28:32 ~ 30,
+#   POSTED_SPEED_LIMIT == 33:37 ~ 35,
+#   POSTED_SPEED_LIMIT == 38:42 ~ 40,
+#   POSTED_SPEED_LIMIT == 43:47 ~ 45,
+#   POSTED_SPEED_LIMIT == 48:52 ~ 50,
+#   POSTED_SPEED_LIMIT == 53:57 ~ 55,
+#   POSTED_SPEED_LIMIT == 58:62 ~ 60,
+#   POSTED_SPEED_LIMIT == 63:70 ~ 65,
+#   POSTED_SPEED_LIMIT > 70 ~ 70))
+```
+
+```{r}
+#crashes per month
+count <- crash %>% 
+  group_by(year= year(CRASH_DATE), month= month(CRASH_DATE)) %>% 
+  summarize(n=n())
+
+count %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(name = "Number of Crashes Per Year")
+
+```
+
+```{r}
+count$date <- mdy(paste0(count$month,"-1-",count$year)) #Date Column
+count <- count %>% 
+  rename(Date=date, Count=n, Month=month, Year=year)
+hc <- highchart(type="stock") %>%
+  hc_add_series(data = count,
+                   type = "line", hcaes(x = Date,
+                   y = Count, 
+                   )) %>% 
+    hc_xAxis(title = list(text="Date")) %>% 
+  hc_colors("#007fff") %>% 
+  hc_plotOptions(series=list(backgroundColor = "#535353")) %>% 
+    hc_tooltip(borderColor = "black",
+             pointFormat = "<b> Crashes</b>: {point.Count}<br>")
+hc
+```
+
+Speed limits were not recorded in common increments of 5pmh. 
+```{r}
+# original crash speed limit data
+crash %>% 
+  group_by(speed_limit=POSTED_SPEED_LIMIT) %>% 
+  summarize(n=n()) %>%
+  kbl(caption = "Crashes Occuring In Each Speed Limit within Chicago") %>% 
+  kable_classic( full_width = T) %>%
+  column_spec(1,  # column 1
+              bold=T,  # make it bold
+              border_right = T) %>% # add the line on the right side of the column
+  column_spec(2)
+```
+
+Now include only increments of 5mph:
+```{r}
+slc <- crash %>% 
+  filter(POSTED_SPEED_LIMIT %in% seq(from=5, to=70, by=5)) %>% 
+    group_by(speed_limit=POSTED_SPEED_LIMIT) %>% 
+    summarize(n=n())
+
+kbl(slc) %>%
+  kable_classic(full_width = F) %>%
+  add_header_above(c("MPH" = 1, "Crashes" = 1)) # number of items in each group and gives them a label
+
+# cooler if you are trying to group multiple variables in a chart.
+```
+Really good link for Kable charts:
+https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+
+## Crashes within each posted speed limit
+```{r}
+n1 <- slc %>% 
+  ggplot(aes(x = speed_limit, y = n)) +
+  geom_bar(stat = "identity", fill="#68ccff")+
+  scale_x_continuous(breaks = seq(5,70,5), labels = seq(5,70,5)) +
+  scale_y_continuous(labels = scales::comma) + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  ylab("Crashes") +
+  xlab("Posted Speed Limit (mph)") +
+  theme(panel.background = element_rect(fill = "#e8f7ff"), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+n1 # get rid of decimal point later
+```
+
+Bring in the [Chicago Beats Shapefile](https://data.cityofchicago.org/w/aerh-rz74/3q3f-6823?cur=wfOoWMuz9-v&from=root) for mapping!
+```{r}
+shapefile <- st_read("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/crashes-COVID19_files/geo_export_19c4ac07-2232-427b-9ba0-127c6c22cd08.shp")
+
+```
+
+
+# Map
+```{r}
+beatcount <- crash %>% 
+  group_by(BEAT_OF_OCCURRENCE) %>% 
+  summarize(count=n()) %>% 
+  arrange(BEAT_OF_OCCURRENCE) # Creating an object  with the count of crashes in each beat
+
+# practice map
+tm_shape(shapefile) +
+  tm_borders() +
+  tm_shape(shapefile) +
+  tm_fill(col = "blue", alpha=0.65)
+
+shapefile$beat_num <- as.numeric(shapefile$beat_num)
+
+#beatmap <- merge(shapefile, beatcount )
+beatmap <- inner_join(shapefile, beatcount, by= c("beat_num" = "BEAT_OF_OCCURRENCE"))
+
+beatmap %>% rename(Crashes=count) %>% qtm("Crashes")
+```
+
+# Crash Statistics
+
+```{r}
+table(crash$WEATHER_CONDITION)
+
+#crash %>% summarize(WEATHER_CONDITION) %>% kbl()
+```
+
+```{r}
+table(crash$LIGHTING_CONDITION)
+```
+
+```{r}
+crash$WEEKDAY <- weekdays(crash$CRASH_DATE) %>% as_factor()
+table(crash$WEEKDAY)
+```
+
+
+# Leaflet Map
+```{r}
+beatmap <- st_transform(beatmap, "+proj=longlat +datum=WGS84") %>% st_zm()
+
+redtheme <- colorNumeric(palette = "Reds", domain=beatmap$count)
+
+leaflet(beatmap) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(stroke = F, 
+              smoothFactor = 0.2,
+              fillOpacity = .8, 
+              color = ~redtheme(beatmap$count))
+```
+
+
+```{r}
+table(crash$WEEKDAY, crash$WEATHER_CONDITION)
+```
+
+# COVID-19 Data
+
+[Info](https://github.com/Covid19R/covid19nytimes)
+
+```{r}
+head(covid19nytimes_states_demo) %>% knitr::kable()
+head(covid19nytimes_counties_demo) %>% kable()
+```
+
+
+```{r}
+library(covid19nytimes)
+
+states_covid <- refresh_covid19nytimes_states() # 48,198 observations, 7 variables
+#58,218 in August 2021
+
+
+# if link is broken load from github folder
+# load("../data/us_states_long.rdata")
+territories <- c("Guam", "Northern Mariana Islands")
+us_states_long <- states_covid %>% filter(!(location %in% territories))
+
+# save(us_states_long, file = "us_states_long.rdata")
+us_states_long %>%
+  head() %>%
+  kable()
+```
+
+
+```{r}
+#counties_covid <- refresh_covid19nytimes_counties() # BIG file, 2,697,942 obs, 7 variables
+```
+
+```{r}
+states_covid %>%
+  filter(location %in% c("Washington", "New York", "Massachusetts", "Michigan", "Illinois")) %>%
+  filter(data_type == "deaths_total") %>%
+  ggplot(aes(x = date, y = value, color = location)) +
+  geom_line() +
+  theme_minimal(base_size=14) +
+  scale_y_continuous()
+```
+
+
+# Sources
+[Chicago Traffic Crash Data](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if)
+
+[COVID-19 Data](https://github.com/Covid19R/covid19nytimes)
+
+
+
+# Example HW from online
+
+- Who did you collaborate with: xxxx
+- Approximately how much time did you spend on this problem set: xxxx
+- What, if anything, gave you the most trouble: xxxx
+
+
+# Load and wrangle data
+
+Load two CSV files and join them to create a data frame named `crashes` (i.e. using `crashes` as the main data frame, left join `COVID19` to it)
+
+```{r load-libraries-data}
+
+#crashes <- read_csv("data/  .csv")
+#COVID19 <- read_csv("data   .csv")
+```

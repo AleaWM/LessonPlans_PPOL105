@@ -26,6 +26,44 @@ library(cuppackage)
 # source("anes_recodes.R", local = knitr::knit_global())
 
 ```
+
+[R Markdown reminders:](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+End a line with two spaces to start a new paragraph.
+*italics* and _italics_
+**bold** and __bold__
+superscript^2^
+~~strikethrough~~
+[link](www.rstudio.com) 
+endash: --
+emdash: ---
+ellipsis: ...
+inline equation: $A = \pi*r^{2}$
+image: ![](path/to/smallorb.png)
+
+horizontal rule (or slide break): ***
+> block quote
+* unordered list
+* item 2
+ + sub-item 1
+ + sub-item 2
+
+1. ordered list
+2. item 2
+ + sub-item 1
+ + sub-item 2
+Table Header | Second Header
+------------- | -------------
+Table Cell | Cell 2
+Cell 3 | Cell 4 
+
+Inline code: Two plus two equals `r` 2 + 2`
+
+```{r}
+
+```
+
+
 # Survey Data Prep
 ```{r, include=FALSE}
 #anes <- read_dta("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/anes_timeseries_2020_stata_20210324.dta")
@@ -141,11 +179,12 @@ Univariate data involves analyzing one variable. It does not deal with causal re
 
 A categorical variable can only take on a specific set of values representing a set of possible categories. Even if a number is assigned to it for data recording purposes, the numbers do not mean anything (eg. taking the average of: 1. Blue, 2. Orange, 3. Green). This occurs most often when analyzing survey data when information is stored as numbered responses (that work for analysis) and labels (that describe the survey options). 
 
-Categorical variables are also called _nominal_ variables
+Categorical variables are also called _nominal_ variables. I always remember this as nominal = numbers have no meaning.
 
 ```{r}
 # good vs bad examples. Link images.
 table(broward$incidentType)
+ggplot(broward) + geom_bar(aes(incidentType))
  
 #quicktab(anes$V201429)
 #table(anes$V201429)
@@ -155,6 +194,20 @@ table(broward$incidentType)
 Frequencies, proportions, bar charts
 ```{r}
 broward # works!!!!!! 
+```
+### Binary Variables
+Binary: Categorical variables with only two options (Yes/No, 0/1, true/false, etc.). Synonyms include: dichotomous, logical, indicator, boolean
+```{r}
+
+```
+
+### Ordinal
+This is a type of categorical variable where the responses have a meaningful order. Age groups, income brackets, Likert scales (Strongly Dislike, Dislike, Neutral, Like, Strongly Like) are all ordinal variables. 
+
+These you must approach carefully when doing analysis. 
+```{r}
+# Income bracket with unequal bracket ranges. Don't just calculate the Average income bracket number.
+
 ```
 
 
@@ -167,7 +220,7 @@ broward # works!!!!!!
 ### Continuous Variables
 
 Data that can take on any value in an interval
-Ex. Age of respondents
+Ex. Age of respondents, 
 ```{r}
 # ANES 2020 Respondent Age
 source("anes_functions.R", local = knitr::knit_global())
@@ -192,19 +245,6 @@ Data can be only integer values, such as counts.
 # frequency table, number of people that responded. Can't be fraction. 
 ```
 
-### Ordinal
-This is a type of categorical variable where the responses have a meaningful order. Age groups, income brackets, Likert scales (Strongly Dislike, Dislike, Neutral, Like, Strongly Like) are all ordinal variables. 
-
-These you must approach carefully when doing analysis. 
-```{r}
-# Income bracket with unequal bracket ranges. Don't just calculate the Average income bracket number.
-
-```
-
-```{r}
-
-```
-
 
 ## Data Distribution 
 The density for a continuous distribution is a measure of relative probabily for getting a value close to x. The probability of getting a value in a particular interval is the area under the corresponding part of the curve. (Calc flashbacks...)
@@ -215,11 +255,32 @@ plot(x, dnorm(x), type = "l") # type = "l" tells R to connect the dots with a li
 
 
 
-- Frequency Tables   
+- Frequency Tables 
+
 - Histograms  hist(x)
-- Quantiles  
-- Q-Q plots  
+A histogram is similar to a barplot but is used for numeric data types. Instead of counting the occurrence of each individual value, a histogram divides the data into bins (buckets/ranges) depending on the entire data range and displays the count. It gives an idea abut the distribution of the _numeric_ variable. 
+```{r}
+ggpot() +
+  geom_histogram(aes())
+```
+
+- Quantiles
+
+
+- Q-Q plots 
+
+
 - Box Plots  
+A Box Plot is used to understand the distribution of numerical type data in the data set. It helps to understand how data is grouped, if data is skewed and identify the outliers in the data.
+
+A boxplot represents data in the below categories:
+Minimum - Mean – (2 X Standard Deviation)
+Q1 - 25th Percentile
+Median - 50th Percentile
+Q3 - 75th Percentile
+Maximum - Mean + (2 X Standard Deviation)
+Outlier - The 0.7% of the data which are more than 2 Standard deviations away from mean
+
 ```{r}
 x <- 0:50
 plot(x, dbinom(x, size = 50, prob = .33), type = "h") # h for histogram
@@ -304,13 +365,24 @@ Examples in slides on taxes changing, comparison of baselines
 # Bivariate Data
 Bivariate data is used to find out if there is a relationship between two different variables. It is frequently represented with scatter plots where one variable is on the X axis and the other is on the Y axis. If the data seems to fit a line or curve then there may be a relationship, or correlation, between the two variables. Always be careful when examining relationships. Many variables may appear related when in fact their relationship happened by chance or a third variable is influencing both variables.
 
+### Scatterplots
+Scatter plots can be used to identify if any relationship exists between numeric variables. 
+```{r}
+# ggplot() + geom_point()
+# ggscatter
+
+ 
+```
+
+
+
 *Test of Association*: Used to test whether two variables are related to one another or not  
 - Depends on the nature of the variables you are studying (nominal, ordinal, interval) and number of categories  
 - Depends on the nature of the question you're answering (independence, agreement of coders, effect of an intervention, etc.)   
 
 ### Patterns and Models
 
-- Could this pattenr happen by chance?
+- Could this pattern happen by chance?
 - How do you describe the relationship implied by the pattern?
 - How strong is the relationship implied by the pattern?
 - What other variables might affect the relationship?
@@ -361,13 +433,6 @@ for (i in 1: 100)
 ```
 
 
-### Scatterplots
-```{r}
-# ggplot() + geom_point()
-# ggscatter
-
- 
-```
 
 ## Two-Way Tables
 - Contingency tables: A tally of counts between two or more categorical variables.

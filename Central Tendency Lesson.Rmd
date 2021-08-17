@@ -10,6 +10,7 @@ output:
     theme: journal
 runtime: shiny_prerendered
 ---
+Learning about centrality, means, medians, modes, and variance.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
@@ -18,97 +19,19 @@ library(shiny)
 library(learnr)
 library(stevedata)
 library(tidyverse)
-quartets <- as.data.frame(stevedata::quartets)
-crash <- read_csv("~/GitHub/PPOL105/Traffic_Crashes_Cleaned.csv")
+library(kableExtra)
+quartets <- as_tibble(stevedata::quartets)
+crash <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/PPOL105_Excel_Files/Traffic_Crashes_Cleaned.csv")
 
 # quartets is now primed for all following chunks so code can be run in any order
 ```
 
-```{r quartets tibble}
-quartets
-```
-
-exercise.eval = true: chunk output is visible by default
-exercise = true: allows for interactive fetures
-```{r filter, exercise = TRUE, exercise.eval=TRUE}
-# Look at only Group 1
-filter(quartets, group == "Quartet 1")
-```
-
-To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
-
-# Inputs and Outputs
-
-You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change.  
-This demonstrates how a standard R plot can be made interactive by wrapping it in the Shiny `renderPlot` function. The `selectInput` and `sliderInput` functions create the input widgets used to drive the plot.
-
-```{r quartets plot, echo=FALSE}
-inputPanel(
-  selectInput("n_breaks", label = "Number of bins:",
-              choices = c(1, 2, 5, 9), selected = 5),
-  
-  sliderInput("bw_adjust", label = "Bandwidth adjustment:",
-              min = 1, max = 8, value = 1, step = 1)
-)
-
-renderPlot({
-  hist(quartets$group1, probability = TRUE, breaks = as.numeric(input$n_breaks),
-       xlab = "X Value", main = "Quartet 1")
-  
-  dens <- density(quartets$group, adjust = input$bw_adjust)
-  lines(dens, col = "blue")
-})
-```
-
-# Embedded Application
-
-It's also possible to embed an entire Shiny application within an R Markdown document using the `shinyAppDir` function. This example embeds a Shiny application located in another directory:
-
-```{r tabsets, echo=FALSE}
-shinyAppDir(
-  system.file("examples/06_tabsets", package = "shiny"),
-  options = list(
-    width = "100%", height = 550
-  )
-)
-```
-
-# Measuring the Center
-
-Mean:
-The average. Has a formula.
-In Excel: =AVERAGE((CELL_1 + CELL_2 + CELL_3)/(Number_Of_Cells))
-
-Calculate the mean
-```{r mean, exercise = TRUE }
-( 4 + 6 + 2 ) / 3
-```
-
-
-Median: 
-Think of the thing between lanes in a road - the median. It is in the center. Equally distanced between both sides. 
-
-Mode:
-
-
-
-
-```{r quartets}
-summary(quartets)
-```
-
-```{r}
-quartets$x_cord <- quartets$x # R did not like the variables named x or y since those are also used in command. Renamed variables to avoid issues.
-quartets$y_cord <- quartets$y
-quartets_wide <-pivot_wider(quartets, names_from = group,
-              values_from = c(x_cord, y_cord)) 
-
-write.csv(quartets_wide, "quartets_wide.csv")
-
-quartets_wide
-```
-```{r}
-summary(quartets_wide)
+Below is the quartets dataset in a long version.
+```{r quartets long tibble, echo=FALSE}
+quartets %>%
+  kbl() %>%
+  kable_styling()%>%
+  scroll_box(width = "500px", height = "200px")
 ```
 
 If you include all the observations together:
@@ -124,10 +47,107 @@ groupgraphs <- ggplot(quartets) +
 groupgraphs
 ```
 
+Here are the descriptive statistics for each group:
+```{r, tidy=TRUE}
+quartets %>% 
+  group_by(group) %>% 
+  summarize(averageX = mean(x), averageY=mean(y), varianceX =var(x), varianceY=var(y), medianX = median(x), medianY = median(y)) %>%
+  kbl()%>%
+  kable_paper("hover", full_width = T)
+```
+
+Compare it to the descriptive statistics for all the groups together:
+```{r quartets}
+summary(quartets) %>%
+  kbl()%>%
+  kable_styling()
+```
+Thoughts??
+
+
+
+```{r filter, exercise = TRUE, exercise.eval=FALSE}
+# Look at only one of the groups
+filter(quartets, group == "Quartet 1")
+```
+
+# Inputs and Outputs
+
+```{r, include=FALSE, echo=FALSE}
+# You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change.  
+# This demonstrates how a standard R plot can be made interactive by wrapping it in the Shiny `renderPlot` function. The `selectInput` and `sliderInput` functions create the input widgets used to drive the plot.
+```
+
+
+```{r quartets plot, echo=FALSE}
+inputPanel(
+  selectInput("n_breaks", label = "Number of bins:",
+              choices = c(1, 2, 5, 9), selected = 5),
+  
+  sliderInput("bw_adjust", label = "Binwidth adjustment:",
+              min = 1, max = 8, value = 1, step = 1)
+)
+
+renderPlot({
+  hist(quartets$x, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "X Value", main = "Quartets")
+  
+  # dens <- density(quartets$group, adjust = input$bw_adjust)
+  # lines(dens, col = "blue")
+})
+```
+
+# Measuring the Center
+
+Mean:
+The average. Has a formula.
+In Excel: =AVERAGE((CELL_1 + CELL_2 + CELL_3)/(Number_Of_Cells))
+
+Calculate the mean
+```{r mean, exercise = TRUE }
+( 4 + 6 + 2 ) / 3
+```
+
+Median: 
+Think of the thing between lanes in a road - the median. It is in the center. Equally distanced between both sides. 
+
+
+Mode:
+
+Check out the histogram
+
+
+
+
+```{r, include=FALSE, echo= FALSE}
+# Delete this section?
+
+# quartets$x_cord <- quartets$x # R did not like the variables named x or y since those are also used in command. Created new variables to avoid issues.
+# quartets$y_cord <- quartets$y
+# quartets_wide <-pivot_wider(quartets, names_from = group,
+#               values_from = c(x_cord, y_cord)) 
+# 
+# # write.csv(quartets_wide, "quartets_wide.csv")
+# 
+# quartets_wide
+# ```
+# ```{r quartets wide tibble}
+# quartetswide <- pivot_wider(quartets,  names_from = group, values_from = group)
+# quartetswide %>% 
+#   kbl() %>% 
+#   kable_styling()
+# ```
+
+# ```{r}
+# summary(quartets_wide)
+```
+
+
+
 
 Now split it into groups
 
-```{r}
+```{r, tidy=TRUE}
 quartets %>% 
   group_by(group) %>% 
   summarize(averageX = mean(x), averageY=mean(y), varianceX =var(x), varianceY=var(y), medianX = median(x), medianY = median(y))
@@ -138,16 +158,17 @@ Quartet1 <- quartets %>% filter(group=="Quartet 1")
 plot(Quartet1$x, Quartet1$y)
 ```
 
-```{r separate quartets}
+```{r separate quartets, echo = FALSE}
 Quartet2 <- quartets %>% filter(group=="Quartet 2")
 Quartet3 <- quartets %>% filter(group=="Quartet 3")
 Quartet4 <- quartets %>% filter(group=="Quartet 4")
 ```
 
-```{r}
-ggplot(quartets, aes(x=))
+```{r, echo=FALSE}
+# ggplot(quartets, aes(x=))
 ```
 
+Slope of all quartet groups together:
 ```{r}
 reg = lm(y~x, data=quartets) # all x's and y's for all 4 Quartets
 
@@ -176,11 +197,13 @@ ggplot(data = quartets) +
   theme_bw()
 ```
 
-Save your file!
 ```{r}
+# Save your file!
+
 # write.csv(quartets, file = "quartets_long.csv")
 ```
 
+# Chicago Crash Data
 ```{r}
 # plot of Chicago Crash Data
 crash %>%
@@ -195,8 +218,13 @@ crash %>%
   xlab("Crashes Per Hour") +
   ylab("Number of Crashes during YEAR")
 ```
+
 ```{r}
-median(crash$CRASH_HOUR) 
+median(crash$CRASH_HOUR)
+```
+
+
+```{r}
 mean(crash$CRASH_HOUR)
 ```
 
@@ -204,12 +232,12 @@ mean(crash$CRASH_HOUR)
 
 https://smac-group.github.io/ds/
 ```{r}
-var()
-sd()
-min()
-max()
-range()
-summary()
+# var()
+# sd()
+# min()
+# max()
+# range()
+# summary()
 
 ```
 
