@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE)
 EatTweets <- read_csv("C:/Users/aleaw/OneDrive/Desktop/LessonPlans/LessonPlans_PPOL105/EatTweets.csv")
 ```
 
-This data is from the .....
+This data is from the ..... World Inequality
 ```{r}
 EatTweets # as a tibble
 ```
@@ -29,14 +29,14 @@ EatTweets # as a tibble
 arrange(EatTweets, Year)
 ```
 ```{r Filter, exercise = TRUE, eval=TRUE}
-# change the filter to only at 1990. Then try 2012.
+# change the filter to only include data from 1990. Then try only data from 2012.
 filter(EatTweets, Year == "1985")
 ```
 
 ```{r Select, exercise  = TRUE}
 # change the code to only look at variables for the USA
 select(EatTweets, contains ("UK"))
-```
+``` 
 ```{r}
 custom_checker <- function(label, user_code, check_code, envir_result, evaluate_result, last_value, ...) {
   # this is a code check
