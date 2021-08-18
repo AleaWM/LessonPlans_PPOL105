@@ -86,7 +86,7 @@ So far, so good!
 #                                 "3" = "Junior College",#<<
 #                                 "4" = "Bachelor", #<<
 #                                 "5" = "Graduate")) %>% #<<
-#   group_by(educcat_F) %>%
+#   group_by(educca t_F) %>%
 #   summarize(count = n())
 # class(crash$POSTED_SPEED_LIMIT)
 # crash %>% mutate(POSTED_SPEED_LIMIT == recode(POSTED_SPEED_LIMIT, 
