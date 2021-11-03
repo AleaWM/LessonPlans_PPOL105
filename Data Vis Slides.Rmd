@@ -1,0 +1,1107 @@
+---
+title: "Week 11" 
+subtitle: "Data viz w/ggplot2"
+author: "PPOL 105 - Alea Wilbur-Mujtaba"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, hygge, ninjutsu]
+    nature:
+      ratio: 16:10
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(fig.width = 6, message = FALSE, 
+                      warning = FALSE, comment = "", 
+                      cache = F)
+```
+
+```{r, include= FALSE}
+library(flipbookr)
+library(tidyverse)
+library(paletteer)
+library(RColorBrewer)
+```
+
+```{css, eval = TRUE, echo = FALSE}
+.remark-code{line-height: 1.5; font-size: 80%}
+@media print {
+  .has-continuation {
+    display: block;
+  }
+}
+```
+
+# Choosing the right graph
+
+All graph pictures in this section come from this great website called [**Data to Viz**](https://www.data-to-viz.com/), which you should add your bookmarks! There are A LOT websites on data visualization, and this is one of the most interesting to me. 
+
+* Decision tree to pick the right graph
+
+* List of common mistakes
+
+* R codes
+
+There are other good websites such as [depict data studio](https://depictdatastudio.com/charts/) pr the [R Graph Gallery](https://www.r-graph-gallery.com/).
+
+
+---
+class: inverse, middle, center
+# ggplot2
+
+---
+# ggplot2
+
+ggplot2 is the package for data visualization in R.
+
+How it works? 
+
+* ggplot2 is built around "layers" - we are going to add layers of information on top of each others as we build our graph (e.g., information about the type of graph, information about the axes, about the title and so on...)
+
+* Each line of the graph is separated by a **+** (similar to a pipe approach). 
+
+---
+
+Where to start:
+
+**Step 1** is to chose the data that you want to use 
+
+```{r eval = F}
+ggplot(data = YOUR_DATA) +  #call your data
+  
+#OR you can start with a pipe
+  
+data %>%
+  ggplot()
+
+```
+
+**Step 2** is to specify the type of graph that you want to create using **geom**
+
+```{r eval = F}
+geom_PLOTTYPE(mapping = aes(x = VARIABLE, y = VARIABLE2)) 
+```
+
+---
+#geom
+
+There are several geom functions which are pretty intuitive to remember:
+
+* geom_point = scatterplots
+
+* geom_histogram = histogram
+
+* geom_bar = bar plot
+
+* geom_boxplot = boxplot
+
+* geom_density = density plot
+
+* geom_dotplot = dotplot
+
+[Full list of geom_ functions can be found here](https://ggplot2.tidyverse.org/reference/)
+
+---
+# data
+
+We are going to use the **election_turnout** dataset from the **stevedata** package.
+
+```{r, message = F, warning = F}
+
+#install.packages("stevedata")
+library(stevedata)
+election_turnout
+```
+
+Let's see how to do some basics graphs...
+
+---
+## Histogram
+
+First, let's use a histogram to look at the **turnout** percentage across states
+
+```{r out.width = "35%", fig.align = "center"}
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho))
+```
+
+---
+### barplot bins
+
+The width of the bins in you graph can be tricky - if you vary it, you graph representation also changes quite a bit
+
+* **binwidth** defines how many observations should be included in each bin
+
+* **bins** define how many bins you want to create.
+
+You need to use one or the other within the aes argument.
+
+---
+
+`r chunk_reveal(chunk_name = "my_code5", break_type = "rotate", widths = c(50, 50), title = "## Histogram")`
+
+```{r my_code5, eval = F, echo = F}
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho), 
+                 binwidth = 10 #ROTATE
+                 binwidth = 5 #ROTATE
+                 binwidth = 1 #ROTATE
+                 bins = 10 #ROTATE
+                 )
+```
+
+---
+## Density plot
+
+A better way to look at the distribution is by using a density plot. 
+
+```{r out.width = "35%", fig.align = "center"}
+ggplot(data = election_turnout) +
+  geom_density(mapping = aes(x = turnoutho))
+```
+
+---
+
+`r chunk_reveal(chunk_name = "my_code1", break_type = "rotate", widths = c(50, 50), title = "## Density Plot")`
+
+Since mean and median are very similar, it's likely we are looking at a normal distribution
+
+
+```{r my_code1, eval = F, echo = F}
+ggplot(data = election_turnout) +
+  geom_density(mapping = aes(x = turnoutho)) + #BREAK
+  geom_vline(xintercept =
+               mean(election_turnout$turnoutho) #ROTATE
+               median(election_turnout$turnoutho) #ROTATE
+             )
+```
+
+---
+## Simple Bar Chart
+
+X axis is the category of region  
+Default option for geom_bar is to provide the count of observations on the y-axis  
+```{r out.width = "35%", fig.align = "center"}
+election_turnout %>% 
+  ggplot() +
+  geom_bar(mapping = aes(x = region )) 
+```
+
+---
+## Stacked Bar Chart
+
+We can use a stacked barplot to highlight a new dimension of the data (e.g., states where Trump won)
+
+Y axis is the number of states from each region.   
+X axis is the category of region  
+`fill = ` adds color to each option within the trumpw variable (0 or 1)  
+
+`position =` determines how bars are arranged:
+- "stack" is the default 
+- "fill" is a 100% stacked bar chart
+- "dodge" is a clustered bar chart
+- "identity" overlaps the bars. 0 is behind 1.
+
+
+---
+
+`r chunk_reveal(chunk_name = "my_code2", break_type = "rotate", widths = c(50, 50), title = "## Stacked Bar Plot")`
+
+```{r my_code2, eval = F, echo = F}
+
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, 
+                         fill = as.character(trumpw)), 
+           position = "stack" #ROTATE
+           position = "fill" #ROTATE
+           position = "dodge" #ROTATE
+           position = "identity" #ROTATE
+           ) 
+```
+
+
+---
+## Facet
+
+Another way to look at differences across states based off Trump's victory is by splitting the graph. We can use *facet* to split a plot into multiple plots according to one or more categorical variables.
+
+```{r out.length = "35%", fig.align = "right"}
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, 
+                         fill = as.character(trumpw))) + 
+  facet_grid(~as.character(trumpw))
+```
+
+---
+## Scatterplot
+
+```{r out.width = "35%", fig.align = "center"}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, 
+                           y = turnoutho))
+```
+
+---
+### Add Color for region
+```{r out.width = "40%", fig.align = "center"}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = region))
+
+```
+
+---
+### Add color for if trump won
+```{r out.width = "40%", fig.align = "center"}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = as.character(trumpw)))
+
+```
+
+---
+`r chunk_reveal(chunk_name = "my_code10", break_type = "rotate", widths = c(45, 55), title = "### Facet Wrap Scatter Plots by Region")`
+
+```{r my_code10, eval = F, echo = F}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, 
+                           y = turnoutho, 
+                           color = as.character(trumpw))) +
+  facet_wrap(~region) #ROTATE
+  facet_wrap(~region, ncol = 1) #ROTATE
+  facet_wrap(~region, nrow = 1) #ROTATE
+
+```
+
+---
+#Correlation
+
+Note that you can also calculate the strength of the correlation between the two variables and add it on top of a scatter plot.
+
+* **-1** indicates a strong negative correlation (one variable increses, the other decreases)
+
+* **0** indicates no correlation (the line is horizontal)
+
+* **+1** indicates a strong positive correlation (one variable increases, the other increases)
+
+```{r}
+cor(election_turnout$turnoutho, election_turnout$perhsed)
+```
+
+---
+## Correlation line
+
+You can represent the correlation line on the graph by calculating the line parameter with a simple bivariate regression.
+turnoutho: voter turnout for the highest office as percent of voting eligible population
+perhsed: percentage of the state that completed highschool
+
+**Step 1: calculate the parameters**
+
+```{r}
+reg = lm(turnoutho ~ perhsed, data = election_turnout)
+reg$coefficient
+```
+
+**Step 2: add them to your graph**
+```{r, eval = FALSE}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, 
+                           y = turnoutho, 
+                           color = as.character(trumpw))) +
+  geom_abline(intercept = INTERCEPT_COEFFICIENT, slope = SLOPE_COEFFICIENT)
+```
+
+
+---
+### Correlation line
+
+```{r out.width = "40%", fig.align = "center"}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = as.character(trumpw))) +
+  geom_abline(intercept = -32.303, slope = 1.055)
+```
+
+---
+### Correlation line
+
+```{r out.width = "40%", fig.align = "center"}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = as.character(trumpw))) +
+  geom_abline(intercept = reg$coefficients[1], slope = reg$coefficients[2])
+```
+
+---
+## Boxplots
+
+```{r out.width = "40%", fig.align = "center"}
+
+election_turnout %>%
+ggplot() +
+  geom_boxplot(aes(x = "", y = turnoutho))
+
+```
+
+---
+class: inverse, middle, center
+# Label your graph 
+
+---
+## Labels and titles
+
+```{r}
+# Create item named scatterplot_label
+
+scatterplot_label <-
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color =   as.character(trumpw))) +
+  ylab("Voter turnout percentage") +
+  xlab("% high school diploma") + 
+  labs(title = "Correlation between voter turnout and education",
+       subtitle = "across US States in 2016")
+
+```
+
+---
+```{r out.width = "50%", fig.align = "center"}
+scatterplot_label
+```
+
+---
+## Change the axis
+
+You x and y axis need to make sense given your data (check out the summary statistics to define them). It is possible that R plot is not producing your axes correctly 
+
+Some general rules:
+
+**Barplots:** 
+* Y-axis should start at zero to avoid distorting the visual
+* The scope is to emphasize the absolute magnitude of a variable
+
+**Other graphs:**  
+* It is not reasonable to assume that the data will assume a value of zero (e.g., stock price)
+* We would not be able to observe data variation if we were to start at zero.
+  * Line plot: you generally do not start at zero as the scope is to show change over time
+
+---
+## Change the axis
+
+**Continuous variables** 
+
+* scale_y_continous
+* scale_x_continuous
+
+**Discrete variables**
+* scale_y_discrete
+* scale_x_discrete
+
+---
+## scale function
+
+* **name:** x or y axis labels
+
+* **breaks:** to control the breaks in axis
+
+* **labels:** labels of axis tick marks. 
+
+* **limits:** a numeric vector specifying x or y axis limits (min, max)
+
+* **trans:** for axis transformations. Possible values are “log2”, “log10”, …
+
+---
+
+`r chunk_reveal(chunk_name = "my_code17", break_type = "non_seq", widths = c(45, 55), title = "Example 1")`
+
+```{r my_code17, include = F}
+
+ggplot(data = election_turnout) + #BREAK1
+  geom_histogram(mapping = aes(x = turnoutho)) + #BREAK1
+  scale_x_continuous( #BREAK1
+                     name = "Voter turnout", #BREAK2
+                     limits = c(0,100), #BREAK3
+                     breaks = seq(0, 100, by = 10) #BREAK4
+                       ) #BREAK1
+```
+
+---
+
+`r chunk_reveal(chunk_name = "my_code18", break_type = "non_seq", widths = c(45, 55), title = "Example 2")`
+
+
+```{r my_code18, include = F}
+
+ggplot(data = election_turnout) + #BREAK1
+  geom_bar(mapping = aes(x = region, #BREAK1
+                         fill = as.character(trumpw)), #BREAK1
+                         position = "fill") +#BREAK1
+  scale_x_discrete(#BREAK1
+           name = "States by region" #BREAK2
+           ) + #BREAK1
+  scale_y_continuous( #BREAK1
+           name = "Percentage of states where Trump won", #BREAK3
+           labels = c("0", "25%", "50%", "75%", "100%") #BREAK4
+           )#BREAK1
+```
+
+
+---
+
+`r chunk_reveal("my_code19", break_type = "non_seq", widths = c(50,50), title = "Example 3")`
+
+```{r my_code19, include = F}
+
+ggplot(data = election_turnout) + #BREAK1
+  geom_bar(mapping = aes(x = region,  #BREAK1
+                         fill = as.character(trumpw)), #BREAK1
+                         position = "dodge") + #BREAK1
+  scale_x_discrete(#BREAK1
+            name = "Region" #BREAK2
+            ) +#BREAK1
+  scale_y_continuous(#BREAK1
+            name = "Numbers of states where Trump won", #BREAK3
+            limits = c(0,14), #BREAK4
+            breaks = c(0, 2, 4, 6, 8, 10, 12, 14), #BREAK5
+                    ) +#BREAK1
+  theme(#BREAK1
+    legend.title = element_blank(), #BREAK6
+       )#BREAK1
+
+```
+
+---
+class: inverse, middle, center
+# Making your graph prettier
+
+---
+#Basic arguments
+
+* **color** applies to points, lines, text, borders
+
+* **fill** applies to any area that can be filled
+
+* **size** specifies the size of your elements
+
+* **shape** applies different shapes to points
+
+* **line** specifies the type of line to be used
+
+* **alpha** changes transparency of your color
+  
+By playing around with these arguments you can easily change the look of your graph.
+
+---
+## color and fill
+
+There are at least 4 ways to change color to your graph:
+
+* Colors can be indicated by their **R name**. I use this method for exploratory graph as I quickly remember a few basic color names by heart (e.g., "white", "red", "darkgreen", "darkblue", ....)
+
+* **Hex codes** look like this: "#69b3a2". I prefer this system to customize my graphs using some of the websites above
+
+* **RBG specification** - how much Red, Blue, and Green is contained in each color. This method is also good for customization but you need to report three values so I found it a bit more time consuming than the hex code
+
+* **palettes** are pre-defined sets of colors that are available in different R packages, among which paletteer and brewer. This is a pretty good and time-saving when you have several groups to show (i.e., need to use several colors) or you want to quick fix some colors.
+
+---
+### Choose your colors
+
+There are TONS of good resources to choose colors for your graphs - there is no excuse to ugly colors! Some resources I like:
+
+- [Color in R by name](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf)
+
+- [Color palette generator](https://www.degraeve.com/color-palette/): upload a picture and get the color combination from that picture
+
+- There are several websites [like this one](https://www.webdesignrankings.com/resources/lolcolors/) and [this one](https://coolors.co/palettes/trending) where you can find cool color combinations for your graph. 
+
+R has also several packages for colors - most of which offer pre-made palette of colors that you can use. **paletteer** collects palettes from other packages into one unique place.
+
+- the package can be installed from [here](https://emilhvitfeldt.github.io/paletteer/)
+
+- and here you can find the [full list of colors](https://github.com/EmilHvitfeldt/r-color-palettes/blob/master/type-sorted-palettes.md)
+
+---
+### Some examples
+
+Let's start by looking at how we can specify colors in R. 
+--
+`r chunk_reveal(chunk_name = "my_code11", break_type = "rotate", widths = c(55, 45))`
+
+```{r my_code11, eval = F, echo= F}
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho),
+             color = "darkgreen" #ROTATE
+             color = "#9d0208" #ROTATE
+             color = rgb(9, 24, 154, maxColorValue = 255) #ROTATE
+             )
+```
+
+---
+
+`r chunk_reveal(chunk_name = "my_code12", break_type = "non_seq", widths = c(55, 45), title = "## Boxplot")`
+
+```{r my_code12, eval = F, echo= F}
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region), #BREAK1
+           fill = "#457b9d", #BREAK2
+           color =  "#1d3557", #BREAK3
+           size = 2 #BREAK4
+           ) + #BREAK1
+  geom_hline(yintercept = 10, #BREAK1
+             col = "#e63946", #BREAK5 
+             size = 2 #BREAK6
+             ) #BREAK1
+```
+
+---
+
+`r chunk_reveal(chunk_name = "my_code13", break_type = "non_seq", widths = c(55, 45), title = "## Scatterplot")`
+
+```{r my_code13, eval = F, echo= F}
+
+election_turnout %>%
+  ggplot() +  
+  geom_point(mapping = #BREAK1
+               aes(x = perhsed, #BREAK1 
+                   y = turnoutho), #BREAK1
+               color = "darkgreen", #BREAK2
+               alpha = 0.5,  #BREAK5
+               size = 5, #BREAK3
+               shape = 18 #BREAK4
+             ) #BREAK1
+```
+
+---
+### alpha
+
+This parameter sets the transparency of your color 
+
+It is particularly useful in case of **overplotting** - there are too many observations on one graph and they overlap on one another. The overlap prevents the reader to distinguish the number of observations on a graph. Transparency helps to visualize them.
+
+* Darker color means that there are multiple observations on one another
+
+* Also good for showing two groups on a graph (old vs. new groups or predicted vs. fitted values).
+
+---
+### Colors in aes 
+
+Remember that we used color and fill inside the **aes** field to specify whether the observations on our graph should have been grouped according to a categorical variable. 
+
+In that case, changing colors works slightly differently...
+---
+
+`r chunk_reveal(chunk_name = "my_code14", break_type = "non_seq", widths = c(55, 45))`
+
+
+```{r my_code14, include = F, include = F, eval = F, echo= F}
+
+election_turnout %>%
+  ggplot() +  #BREAK1
+  geom_point(mapping =  #BREAK1
+               aes(x = perhsed, #BREAK1
+                   y = turnoutho, #BREAK1
+                   color = as.character(trumpw)), #BREAK1
+                   size = 5, #BREAK1
+                   alpha = 0.8, #BREAK1
+                   color = "red" #BREAK2
+             ) #BREAK1
+                    
+```
+
+---
+class: inverse, middle, center
+#Scales
+
+---
+## Scales
+
+Scales in ggplot2 control the mapping from data to aesthetics. They take your data in **aes** and turn it into something that you can see.
+
+Remember in aes you can map:
+
+* position (x or y)
+* shape
+* size
+* color
+* line
+
+As long as you have mapped a variable to an aesthetic with aes(), you can use the scale_*() functions to deal with it.
+
+We already used some scales in previous slides to modify the position argument in aes:
+
+* scale_y_continuous
+* scale_x_continuous
+* scale_y_discrete
+* scale_x_discrete
+
+---
+
+Here are some scales that you can use to change color when color or fill are set up within the aes command. 
+
+**Change aes arguments**
+* scale_fill_manual
+* scale_color_manual
+* scale_shape_manual
+* scale_size_continuous
+* scale_alpha_manual
+
+**Use of palettes**
+* scale_fill_PALETTENAMES
+* scale_color_PALETTENAMES
+
+**Reverse your scale**
+* scale_x_reverse
+* scale_y_reverse
+
+More scales can be found [here](https://ggplot2.tidyverse.org/reference/index.html#section-scales)
+
+---
+### Examples
+
+```{r}
+plot_2 = 
+election_turnout %>%
+  ggplot() + 
+  geom_point(mapping =  
+               aes(x = perhsed, 
+                   y = turnoutho, 
+                   color = as.character(trumpw)), #<< 
+                   size = 5, 
+                   alpha = 0.8) +
+  scale_color_manual(values = c("#9e2a2b", "#b1a7a6")) #<< 
+ 
+```
+
+---
+```{r fig.align = "center"}
+plot_2
+```
+
+---
+### Example2
+
+```{r}
+plot_3 = 
+election_turnout %>%
+  ggplot() + 
+  geom_bar(mapping = 
+             aes(x = region, 
+                 fill = as.character(trumpw))) + #<< 
+  scale_fill_manual(values = c("#9a031e", "#fb8b24")) #<< 
+
+```
+
+---
+```{r fig.align = "center"}
+plot_3
+```
+
+---
+### Example 3
+
+```{r}
+plot_4 = 
+election_turnout %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   shape = as.character(trumpw), #<< 
+                   color = as.character(trumpw)), #<< 
+                   size = 4, 
+                   alpha = 0.8) +
+  scale_shape_manual(values = c(15, 16)) + #<< 
+  scale_color_manual(values = c("#335c67", "#9e2a2b"))#<< 
+
+```
+
+---
+```{r fig.align = "center"}
+plot_4
+```
+
+---
+## palettes
+
+```{r}
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + 
+  scale_fill_brewer() #<< 
+```
+
+---
+```{r}
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + 
+  scale_fill_brewer(palette = "Spectral") #<<  
+```
+
+---
+```{r}
+ggplot(data = election_turnout) + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   color = as.character(trumpw)), size = 5, alpha = 0.8) +
+  scale_color_paletteer_d("nord::aurora") #<< 
+
+```
+
+---
+class: inverse, middle, center
+#Themes
+
+---
+## Themes
+
+You can change the overall appearance of your graph, such as a background, borders and so on.
+
+There are [8 themes built into ggplot2](https://ggplot2.tidyverse.org/reference/ggtheme.html) that you can use to make your graph a better fit for your report.
+
+* theme_grey
+* theme_gray
+* theme_bw
+* theme_linedraw
+* theme_light
+* theme_dark
+* theme_minimal
+* theme_classic
+* theme_void
+* theme_test
+
+---
+## Themes
+
+Let's see this in practice 
+
+```{r my_code16, include = F, eval = F, echo = F}
+
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + 
+    geom_hline(yintercept = 10, col = "#e63946") + 
+    scale_fill_paletteer_d("nord::aurora") + 
+    labs(title = "Number of states by region",
+    subtitle = "Regions are further broken down by whether Trump won") +
+    ylab("Number of states") +
+    xlab("Regions") + 
+    theme_grey() #ROTATE
+    theme_classic() #ROTATE
+    theme_dark() #ROTATE
+    theme_void() #ROTATE
+ 
+```
+
+---
+`r chunk_reveal(chunk_name = "my_code16", break_type = "rotate", widths = c(55, 45))`
+
+---
+### Customized themes - arguments
+
+You can also customized your theme. There are [multiple arguments within the function **theme()**](https://ggplot2.tidyverse.org/reference/theme.html) that you can modify.
+Here is a partial list:
+
+**Axes** (for all axis elements, you can always specify .y or .x)
+* axis.title - *axis labels*
+* axis.text  - *axis ticks' labels*
+* axis.ticks - *tick marks along axes*
+* axis.line  - *line along axed*
+    
+**Legend**
+* legend.background - *background of the legend*
+* legend.margin - *margin around the legend*
+* legend.text - *legend item lables*
+* legend.title - *legend title*
+* legend.position - *legend position*
+
+---
+### Customized themes - arguments
+
+**Panel**
+* panel.background
+* panel.border
+* panel.grid
+
+**Plot**
+* plot.background
+* plot.title
+* plot.subtitle
+* plot.caption
+
+---
+### Customized themes - elements
+
+To modify these elements there are [4 common elements to use](https://ggplot2.tidyverse.org/reference/element.html ) that can be applied to a graph. 
+
+* **element_text()** to modify the text of the plot.title, plot.subtitle, and plot.caption, axis.title.x(.y) or axis.text.x(.y)
+  * family = "Times New Roman", *specify the font to be used*
+  
+  * face = "bold", face = "italic"...*specify the face of the text*
+  
+  * color = "red", *specify the color*
+  
+  * size = 14, *specify the size of the font*
+  
+  * hjust =10, vjust = 10, *set the horizontal and vertical position in the graph*
+  
+  * angle = 30, *specify the angle of the text*
+
+---
+### Customized themes - elements
+
+* **element_line()** to modify components as axis lines, major and minor grid lines
+  * color
+  * size
+  * linetype 
+
+* **element_rect(**) to modify rectangle components such as plot, panel, or legend background
+  * fill
+  * color
+  * size
+  * linetype
+
+* **element_blank()** to remove an element from the graph's theme
+  * examples: axis.ticks = element_blank()
+
+---
+```{r}
+full_plot = ggplot(data = election_turnout) + 
+
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + # aes settings
+
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) + #scales to change aes settings - fill
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) + #scales to change aes settings - position
+  
+  labs(title = "Number of states by region", #title
+  subtitle = "Regions are further broken down by whether Trump won") + #subtitle
+  
+  ylab("Number of states") + #y lables 
+  xlab("Regions") +  #x labels
+  
+  theme_classic() + #theme
+  theme(
+  plot.title = element_text(face = "bold", size = 16), #change plot title format
+  plot.subtitle = element_text(face = "italic", size = 14), #change subtitle format
+  
+  axis.title = element_text(size = 14, face = "bold"), #axis title
+  axis.text = element_text(size = 12, face = "bold"),  #axis lables
+  axis.line = element_blank(), #remove the axis line
+  axis.ticks = element_blank(), #remove the axis ticks
+  
+  legend.title = element_text(size = 12, face = "bold", color = "white"), #change legend title
+  legend.text = element_text(size = 12, face = "bold", color = "white"), #change legend text
+  legend.background = element_rect(fill = "#335c67")) + #change background
+  
+  guides(fill = guide_legend("Trump won", nrow = 2)) #change the legend
+```
+
+
+---
+```{r my_fullcode, eval = F, include = F, echo = F}
+
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + 
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) + 
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) + 
+  labs(title = "Number of states by region", 
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") + 
+  xlab("Regions") + 
+  theme_classic() + 
+  theme( 
+  plot.title = element_text(face = "bold", size = 16), #BREAK1
+  plot.subtitle = element_text(face = "italic", size = 14), #BREAK2
+  axis.title = element_text(size = 14, face = "bold"), #BREAK3
+  axis.text = element_text(size = 12, face = "bold"),  #BREAK4
+  axis.line = element_blank(), #BREAK5
+  axis.ticks = element_blank(), #BREAK6
+  legend.title = element_text(size = 12, face = "bold", color = "white"), #BREAK7
+  legend.text = element_text(size = 12, face = "bold", color = "white"), #BREAK8
+  legend.background = element_rect(fill = "#335c67")#BREAK9
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+
+`r chunk_reveal(chunk_name = "my_fullcode", break_type = "non_seq", widths = c(55, 45))`
+
+---
+```{r fig.align = "center"}
+full_plot
+```
+
+---
+## Saving your theme
+
+This is especially helpful if you are writing a report or a full document.
+
+```{r}
+
+my_new_theme <- 
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"), 
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  
+  legend.title = element_text(size = 12, face = "bold", color = "white"), 
+  legend.text = element_text(size = 12, face = "bold", color = "white"), 
+  legend.background = element_rect(fill = "#335c67"))
+  
+```
+
+---
+## Applying your theme
+```{r}
+
+plot_1 = 
+election_turnout %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   color = as.character(trumpw)), 
+                   size = 5, 
+                   alpha = 0.8) +
+  scale_color_manual(values = c("#e09f3e", "#540b0e")) +
+
+  labs(title = "Relationship between turnout and education",
+  subtitle = "% turnout and % high school education") +
+  
+  ylab("Voter turnout") +
+  xlab("% residents with high school education") + 
+  
+  my_new_theme #<<
+
+
+```
+
+---
+```{r out.width = "50%", fig.align = "center"}
+plot_1
+```
+
+---
+#### Additional themes
+
+There are several packages with customized themes that you can use inspired by newspapers, other software, TV series...
+
+ggthemes - https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/ 
+hrbrthemes - https://github.com/hrbrmstr/hrbrthemes 
+ggpomological (an older feeling...) - https://www.garrickadenbuie.com/project/ggpomological/
+ggtech (inspired by tech companies) - https://github.com/ricardo-bion/ggtech 
+
+To use them:
+
+```{r eval = F}
+install.packages("ggthemes")
+library("ggthemes")
+
+election_turnout %>%
+  ggplot() + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   shape = as.character(trumpw), 
+                   size = 4, 
+                   alpha = 0.8) +
+  scale_shape_manual(values = c(15, 16)) + 
+  theme_stata() #<< 
+
+```
+
+---
+# Save your plot
+
+To save your plot, you can use **ggsave** as shown here.
+
+```{r, eval = F}
+
+ggsave(filename = "my_first_plot.png",  # you can also use .pdf
+        plot = plot_1)
+
+ggsave(filename = "my_first_plot.png",
+       plot = plot_1,
+       width = 10,
+       height = 10,
+       units = "in")
+
+```
+
+---
+## Saving your plot
+
+Here are some general guidelines:
+
+**.JPEG (maintains colors)**
+* Lots of colors (like a photograph)
+* Images on the Internet
+* Billboard size 
+
+**.PNG (compress a few colors)**
+* Few colors
+* Not a photograph
+* To be used in Word or other document
+
+**.PDF or .SVG**
+* Plan to use in Adobe 
+* Plan to use in multiple sizes 
+
+
+---
+Other examples
+
+---
+
+`r chunk_reveal("my_cars")`
+
+```{r my_cars, include = FALSE}
+cars %>%
+  filter(speed > 4) %>%
+  ggplot() +
+  aes(x = speed) + #BREAK
+  aes(y = dist) + #BREAK
+  geom_point(
+    alpha = .8, 
+    color = "blue" 
+    ) + 
+  aes(size = speed) #BREAK
+```
+
+
+---
+
+`r chunk_reveal("my_cars2", break_type = "rotate", title = "## Changing the Filter")`
+
+```{r my_cars2, eval = FALSE, echo=FALSE}
+cars %>%
+  filter(speed > 4) %>% #ROTATE
+  filter(speed > 20) %>% #ROTATE
+  ggplot() +
+  aes(x = speed) + 
+  aes(y = dist) + 
+  geom_point(
+    alpha = .8, 
+    color = "blue" 
+    ) + 
+  aes(size = speed) 
+```
+
+
+---
+
+`r chunk_reveal("my_cars3", omit = "#ROTATE", break_type = "auto", title = "Changing Scale fill")`
+
+`r chunk_reveal("my_cars3", omit = "#OMIT", break_type = "rotate")`
+
+```{r my_cars3, eval = FALSE, echo=FALSE}
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) + 
+  scale_fill_viridis_c(option = "viridis") + #OMIT
+  scale_fill_viridis_c(option = "magma") + #ROTATE
+  scale_fill_viridis_c(option = "cividis") + #ROTATE
+  scale_fill_viridis_c(option = "plasma") + #ROTATE
+  labs(title = "Cars") +
+  xlab("Speed (mph)") +
+  theme(legend.position = "none")
+```
+
