@@ -1,0 +1,3411 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Week 11</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="PPOL 105 - Alea Wilbur-Mujtaba" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Week 11
+## Data viz w/ggplot2
+### PPOL 105 - Alea Wilbur-Mujtaba
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 1.5; font-size: 80%}
+@media print {
+  .has-continuation {
+    display: block;
+  }
+}
+&lt;/style&gt;
+
+# Choosing the right graph
+
+All graph pictures in this section come from this great website called [**Data to Viz**](https://www.data-to-viz.com/), which you should add your bookmarks! There are A LOT websites on data visualization, and this is one of the most interesting to me. 
+
+* Decision tree to pick the right graph
+
+* List of common mistakes
+
+* R codes
+
+There are other good websites such as [depict data studio](https://depictdatastudio.com/charts/) pr the [R Graph Gallery](https://www.r-graph-gallery.com/).
+
+
+---
+class: inverse, middle, center
+# ggplot2
+
+---
+# ggplot2
+
+ggplot2 is the package for data visualization in R.
+
+How it works? 
+
+* ggplot2 is built around "layers" - we are going to add layers of information on top of each others as we build our graph (e.g., information about the type of graph, information about the axes, about the title and so on...)
+
+* Each line of the graph is separated by a **+** (similar to a pipe approach). 
+
+---
+
+Where to start:
+
+**Step 1** is to chose the data that you want to use 
+
+
+```r
+ggplot(data = YOUR_DATA) +  #call your data
+  
+#OR you can start with a pipe
+  
+data %&gt;%
+  ggplot()
+```
+
+**Step 2** is to specify the type of graph that you want to create using **geom**
+
+
+```r
+geom_PLOTTYPE(mapping = aes(x = VARIABLE, y = VARIABLE2)) 
+```
+
+---
+#geom
+
+There are several geom functions which are pretty intuitive to remember:
+
+* geom_point = scatterplots
+
+* geom_histogram = histogram
+
+* geom_bar = bar plot
+
+* geom_boxplot = boxplot
+
+* geom_density = density plot
+
+* geom_dotplot = dotplot
+
+[Full list of geom_ functions can be found here](https://ggplot2.tidyverse.org/reference/)
+
+---
+# data
+
+We are going to use the **election_turnout** dataset from the **stevedata** package.
+
+
+```r
+#install.packages("stevedata")
+library(stevedata)
+election_turnout
+```
+
+```
+# A tibble: 51 x 14
+    year state region division turnoutho perhsed percoled gdppercap    ss trumpw
+   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt; &lt;int&gt;  &lt;int&gt;
+ 1  2016 Alab~ South  East So~      59      84.3     23.5     42663     0      1
+ 2  2016 Alas~ West   Pacific       61.3    92.1     28       81801     0      1
+ 3  2016 Ariz~ West   Mountain      55      86       27.5     43269     0      1
+ 4  2016 Arka~ South  West So~      52.8    84.8     21.1     41129     0      1
+ 5  2016 Cali~ West   Pacific       56.7    81.8     31.4     61924     0      0
+ 6  2016 Colo~ West   Mountain      70.1    90.7     38.1     58009     1      0
+ 7  2016 Conn~ North~ New Eng~      65.2    89.9     37.6     72331     0      0
+ 8  2016 Dela~ South  South A~      64.4    88.4     30       69930     0      0
+ 9  2016 Dist~ South  South A~      60.9    89.3     54.6    181185     0      0
+10  2016 Flor~ South  South A~      64.6    86.9     27.3     42595     1      1
+# ... with 41 more rows, and 4 more variables: trumpshare &lt;dbl&gt;, sunempr &lt;dbl&gt;,
+#   sunempr12md &lt;dbl&gt;, gdp &lt;dbl&gt;
+```
+
+Let's see how to do some basics graphs...
+
+---
+## Histogram
+
+First, let's use a histogram to look at the **turnout** percentage across states
+
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-6-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+---
+### barplot bins
+
+The width of the bins in you graph can be tricky - if you vary it, you graph representation also changes quite a bit
+
+* **binwidth** defines how many observations should be included in each bin
+
+* **bins** define how many bins you want to create.
+
+You need to use one or the other within the aes argument.
+
+---
+
+count: false
+ 
+## Histogram
+.panel1-my_code5-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho),
+*                binwidth = 10
+                 )
+```
+]
+ 
+.panel2-my_code5-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code5_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Histogram
+.panel1-my_code5-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho),
+*                binwidth = 5 #ROTATE
+                 )
+```
+]
+ 
+.panel2-my_code5-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code5_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Histogram
+.panel1-my_code5-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho),
+*                binwidth = 1 #ROTATE
+                 )
+```
+]
+ 
+.panel2-my_code5-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code5_rotate_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Histogram
+.panel1-my_code5-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho),
+*                bins = 10 #ROTATE
+                 )
+```
+]
+ 
+.panel2-my_code5-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code5_rotate_04_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code5-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code5-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code5-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+## Density plot
+
+A better way to look at the distribution is by using a density plot. 
+
+
+```r
+ggplot(data = election_turnout) +
+  geom_density(mapping = aes(x = turnoutho))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-7-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+---
+
+count: false
+ 
+## Density Plot
+.panel1-my_code1-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_density(mapping = aes(x = turnoutho)) +
+  geom_vline(xintercept =
+*              mean(election_turnout$turnoutho)
+             )
+```
+]
+ 
+.panel2-my_code1-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code1_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Density Plot
+.panel1-my_code1-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_density(mapping = aes(x = turnoutho)) +
+  geom_vline(xintercept =
+*              median(election_turnout$turnoutho) #ROTATE
+             )
+```
+]
+ 
+.panel2-my_code1-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code1_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code1-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code1-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code1-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+Since mean and median are very similar, it's likely we are looking at a normal distribution
+
+
+
+
+---
+## Simple Bar Chart
+
+X axis is the category of region  
+Default option for geom_bar is to provide the count of observations on the y-axis  
+
+```r
+election_turnout %&gt;% 
+  ggplot() +
+  geom_bar(mapping = aes(x = region )) 
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-8-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+---
+## Stacked Bar Chart
+
+We can use a stacked barplot to highlight a new dimension of the data (e.g., states where Trump won)
+
+Y axis is the number of states from each region.   
+X axis is the category of region  
+`fill = ` adds color to each option within the trumpw variable (0 or 1)  
+
+`position =` determines how bars are arranged:
+- "stack" is the default 
+- "fill" is a 100% stacked bar chart
+- "dodge" is a clustered bar chart
+- "identity" overlaps the bars. 0 is behind 1.
+
+
+---
+
+count: false
+ 
+## Stacked Bar Plot
+.panel1-my_code2-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+*          position = "stack"
+           )
+```
+]
+ 
+.panel2-my_code2-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code2_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Stacked Bar Plot
+.panel1-my_code2-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+*          position = "fill" #ROTATE
+           )
+```
+]
+ 
+.panel2-my_code2-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code2_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Stacked Bar Plot
+.panel1-my_code2-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+*          position = "dodge" #ROTATE
+           )
+```
+]
+ 
+.panel2-my_code2-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code2_rotate_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Stacked Bar Plot
+.panel1-my_code2-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+*          position = "identity" #ROTATE
+           )
+```
+]
+ 
+.panel2-my_code2-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code2_rotate_04_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code2-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code2-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code2-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+## Facet
+
+Another way to look at differences across states based off Trump's victory is by splitting the graph. We can use *facet* to split a plot into multiple plots according to one or more categorical variables.
+
+
+```r
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, 
+                         fill = as.character(trumpw))) + 
+  facet_grid(~as.character(trumpw))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto 0 auto auto;" /&gt;
+
+---
+## Scatterplot
+
+
+```r
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, 
+                           y = turnoutho))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-10-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+---
+### Add Color for region
+
+```r
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = region))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-11-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+### Add color for if trump won
+
+```r
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = as.character(trumpw)))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-12-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+ 
+### Facet Wrap Scatter Plots by Region
+.panel1-my_code10-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_point(mapping = aes(x = perhsed,
+                           y = turnoutho,
+                           color = as.character(trumpw))) +
+* facet_wrap(~region)
+```
+]
+ 
+.panel2-my_code10-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code10_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+### Facet Wrap Scatter Plots by Region
+.panel1-my_code10-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_point(mapping = aes(x = perhsed,
+                           y = turnoutho,
+                           color = as.character(trumpw))) +
+* facet_wrap(~region, ncol = 1)
+```
+]
+ 
+.panel2-my_code10-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code10_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+### Facet Wrap Scatter Plots by Region
+.panel1-my_code10-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_point(mapping = aes(x = perhsed,
+                           y = turnoutho,
+                           color = as.character(trumpw))) +
+* facet_wrap(~region, nrow = 1)
+```
+]
+ 
+.panel2-my_code10-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code10_rotate_03_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code10-rotate {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code10-rotate {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code10-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+#Correlation
+
+Note that you can also calculate the strength of the correlation between the two variables and add it on top of a scatter plot.
+
+* **-1** indicates a strong negative correlation (one variable increses, the other decreases)
+
+* **0** indicates no correlation (the line is horizontal)
+
+* **+1** indicates a strong positive correlation (one variable increases, the other increases)
+
+
+```r
+cor(election_turnout$turnoutho, election_turnout$perhsed)
+```
+
+```
+[1] 0.5282739
+```
+
+---
+## Correlation line
+
+You can represent the correlation line on the graph by calculating the line parameter with a simple bivariate regression.
+turnoutho: voter turnout for the highest office as percent of voting eligible population
+perhsed: percentage of the state that completed highschool
+
+**Step 1: calculate the parameters**
+
+
+```r
+reg = lm(turnoutho ~ perhsed, data = election_turnout)
+reg$coefficient
+```
+
+```
+(Intercept)     perhsed 
+ -32.302695    1.055291 
+```
+
+**Step 2: add them to your graph**
+
+```r
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, 
+                           y = turnoutho, 
+                           color = as.character(trumpw))) +
+  geom_abline(intercept = INTERCEPT_COEFFICIENT, slope = SLOPE_COEFFICIENT)
+```
+
+
+---
+### Correlation line
+
+
+```r
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = as.character(trumpw))) +
+  geom_abline(intercept = -32.303, slope = 1.055)
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-16-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+### Correlation line
+
+
+```r
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color = as.character(trumpw))) +
+  geom_abline(intercept = reg$coefficients[1], slope = reg$coefficients[2])
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-17-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+## Boxplots
+
+
+```r
+election_turnout %&gt;%
+ggplot() +
+  geom_boxplot(aes(x = "", y = turnoutho))
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-18-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, middle, center
+# Label your graph 
+
+---
+## Labels and titles
+
+
+```r
+# Create item named scatterplot_label
+
+scatterplot_label &lt;-
+ggplot(data = election_turnout) +  
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, color =   as.character(trumpw))) +
+  ylab("Voter turnout percentage") +
+  xlab("% high school diploma") + 
+  labs(title = "Correlation between voter turnout and education",
+       subtitle = "across US States in 2016")
+```
+
+---
+
+```r
+scatterplot_label
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-20-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+## Change the axis
+
+You x and y axis need to make sense given your data (check out the summary statistics to define them). It is possible that R plot is not producing your axes correctly 
+
+Some general rules:
+
+**Barplots:** 
+* Y-axis should start at zero to avoid distorting the visual
+* The scope is to emphasize the absolute magnitude of a variable
+
+**Other graphs:**  
+* It is not reasonable to assume that the data will assume a value of zero (e.g., stock price)
+* We would not be able to observe data variation if we were to start at zero.
+  * Line plot: you generally do not start at zero as the scope is to show change over time
+
+---
+## Change the axis
+
+**Continuous variables** 
+
+* scale_y_continous
+* scale_x_continuous
+
+**Discrete variables**
+* scale_y_discrete
+* scale_x_discrete
+
+---
+## scale function
+
+* **name:** x or y axis labels
+
+* **breaks:** to control the breaks in axis
+
+* **labels:** labels of axis tick marks. 
+
+* **limits:** a numeric vector specifying x or y axis limits (min, max)
+
+* **trans:** for axis transformations. Possible values are “log2”, “log10”, …
+
+---
+
+count: false
+ 
+Example 1
+.panel1-my_code17-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho)) +
+  scale_x_continuous(
+                       )
+```
+]
+ 
+.panel2-my_code17-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code17_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 1
+.panel1-my_code17-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho)) +
+  scale_x_continuous(
+*                    name = "Voter turnout",
+                       )
+```
+]
+ 
+.panel2-my_code17-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code17_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 1
+.panel1-my_code17-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho)) +
+  scale_x_continuous(
+                     name = "Voter turnout",
+*                    limits = c(0,100),
+                       )
+```
+]
+ 
+.panel2-my_code17-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code17_non_seq_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 1
+.panel1-my_code17-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_histogram(mapping = aes(x = turnoutho)) +
+  scale_x_continuous(
+                     name = "Voter turnout",
+                     limits = c(0,100),
+*                    breaks = seq(0, 100, by = 10)
+                       )
+```
+]
+ 
+.panel2-my_code17-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code17_non_seq_04_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code17-non_seq {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code17-non_seq {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code17-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+Example 2
+.panel1-my_code18-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "fill") +
+  scale_x_discrete(
+           ) +
+  scale_y_continuous(
+           )
+```
+]
+ 
+.panel2-my_code18-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code18_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 2
+.panel1-my_code18-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "fill") +
+  scale_x_discrete(
+*          name = "States by region"
+           ) +
+  scale_y_continuous(
+           )
+```
+]
+ 
+.panel2-my_code18-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code18_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 2
+.panel1-my_code18-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "fill") +
+  scale_x_discrete(
+           name = "States by region"
+           ) +
+  scale_y_continuous(
+*          name = "Percentage of states where Trump won",
+           )
+```
+]
+ 
+.panel2-my_code18-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code18_non_seq_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 2
+.panel1-my_code18-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "fill") +
+  scale_x_discrete(
+           name = "States by region"
+           ) +
+  scale_y_continuous(
+           name = "Percentage of states where Trump won",
+*          labels = c("0", "25%", "50%", "75%", "100%")
+           )
+```
+]
+ 
+.panel2-my_code18-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code18_non_seq_04_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code18-non_seq {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code18-non_seq {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code18-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+
+---
+
+count: false
+ 
+Example 3
+.panel1-my_code19-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "dodge") +
+  scale_x_discrete(
+            ) +
+  scale_y_continuous(
+                    ) +
+  theme(
+       )
+```
+]
+ 
+.panel2-my_code19-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code19_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 3
+.panel1-my_code19-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "dodge") +
+  scale_x_discrete(
+*           name = "Region"
+            ) +
+  scale_y_continuous(
+                    ) +
+  theme(
+       )
+```
+]
+ 
+.panel2-my_code19-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code19_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 3
+.panel1-my_code19-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "dodge") +
+  scale_x_discrete(
+            name = "Region"
+            ) +
+  scale_y_continuous(
+*           name = "Numbers of states where Trump won",
+                    ) +
+  theme(
+       )
+```
+]
+ 
+.panel2-my_code19-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code19_non_seq_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 3
+.panel1-my_code19-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "dodge") +
+  scale_x_discrete(
+            name = "Region"
+            ) +
+  scale_y_continuous(
+            name = "Numbers of states where Trump won",
+*           limits = c(0,14),
+                    ) +
+  theme(
+       )
+```
+]
+ 
+.panel2-my_code19-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code19_non_seq_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 3
+.panel1-my_code19-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "dodge") +
+  scale_x_discrete(
+            name = "Region"
+            ) +
+  scale_y_continuous(
+            name = "Numbers of states where Trump won",
+            limits = c(0,14),
+*           breaks = c(0, 2, 4, 6, 8, 10, 12, 14),
+                    ) +
+  theme(
+       )
+```
+]
+ 
+.panel2-my_code19-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code19_non_seq_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Example 3
+.panel1-my_code19-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region,
+                         fill = as.character(trumpw)),
+                         position = "dodge") +
+  scale_x_discrete(
+            name = "Region"
+            ) +
+  scale_y_continuous(
+            name = "Numbers of states where Trump won",
+            limits = c(0,14),
+            breaks = c(0, 2, 4, 6, 8, 10, 12, 14),
+                    ) +
+  theme(
+*   legend.title = element_blank(),
+       )
+```
+]
+ 
+.panel2-my_code19-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code19_non_seq_06_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code19-non_seq {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code19-non_seq {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code19-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+class: inverse, middle, center
+# Making your graph prettier
+
+---
+#Basic arguments
+
+* **color** applies to points, lines, text, borders
+
+* **fill** applies to any area that can be filled
+
+* **size** specifies the size of your elements
+
+* **shape** applies different shapes to points
+
+* **line** specifies the type of line to be used
+
+* **alpha** changes transparency of your color
+  
+By playing around with these arguments you can easily change the look of your graph.
+
+---
+## color and fill
+
+There are at least 4 ways to change color to your graph:
+
+* Colors can be indicated by their **R name**. I use this method for exploratory graph as I quickly remember a few basic color names by heart (e.g., "white", "red", "darkgreen", "darkblue", ....)
+
+* **Hex codes** look like this: "#69b3a2". I prefer this system to customize my graphs using some of the websites above
+
+* **RBG specification** - how much Red, Blue, and Green is contained in each color. This method is also good for customization but you need to report three values so I found it a bit more time consuming than the hex code
+
+* **palettes** are pre-defined sets of colors that are available in different R packages, among which paletteer and brewer. This is a pretty good and time-saving when you have several groups to show (i.e., need to use several colors) or you want to quick fix some colors.
+
+---
+### Choose your colors
+
+There are TONS of good resources to choose colors for your graphs - there is no excuse to ugly colors! Some resources I like:
+
+- [Color in R by name](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf)
+
+- [Color palette generator](https://www.degraeve.com/color-palette/): upload a picture and get the color combination from that picture
+
+- There are several websites [like this one](https://www.webdesignrankings.com/resources/lolcolors/) and [this one](https://coolors.co/palettes/trending) where you can find cool color combinations for your graph. 
+
+R has also several packages for colors - most of which offer pre-made palette of colors that you can use. **paletteer** collects palettes from other packages into one unique place.
+
+- the package can be installed from [here](https://emilhvitfeldt.github.io/paletteer/)
+
+- and here you can find the [full list of colors](https://github.com/EmilHvitfeldt/r-color-palettes/blob/master/type-sorted-palettes.md)
+
+---
+### Some examples
+
+Let's start by looking at how we can specify colors in R. 
+--
+count: false
+ 
+
+.panel1-my_code11-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_point(mapping = aes(x = perhsed, y = turnoutho),
+*            color = "darkgreen"
+             )
+```
+]
+ 
+.panel2-my_code11-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code11_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_code11-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_point(mapping = aes(x = perhsed, y = turnoutho),
+*            color = "#9d0208" #ROTATE
+             )
+```
+]
+ 
+.panel2-my_code11-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code11_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_code11-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_point(mapping = aes(x = perhsed, y = turnoutho),
+*            color = rgb(9, 24, 154, maxColorValue = 255) #ROTATE
+             )
+```
+]
+ 
+.panel2-my_code11-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code11_rotate_03_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code11-rotate {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code11-rotate {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code11-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+## Boxplot
+.panel1-my_code12-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region),
+           ) +
+  geom_hline(yintercept = 10,
+             )
+```
+]
+ 
+.panel2-my_code12-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code12_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Boxplot
+.panel1-my_code12-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region),
+*          fill = "#457b9d",
+           ) +
+  geom_hline(yintercept = 10,
+             )
+```
+]
+ 
+.panel2-my_code12-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code12_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Boxplot
+.panel1-my_code12-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region),
+           fill = "#457b9d",
+*          color =  "#1d3557",
+           ) +
+  geom_hline(yintercept = 10,
+             )
+```
+]
+ 
+.panel2-my_code12-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code12_non_seq_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Boxplot
+.panel1-my_code12-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region),
+           fill = "#457b9d",
+           color =  "#1d3557",
+*          size = 2
+           ) +
+  geom_hline(yintercept = 10,
+             )
+```
+]
+ 
+.panel2-my_code12-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code12_non_seq_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Boxplot
+.panel1-my_code12-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region),
+           fill = "#457b9d",
+           color =  "#1d3557",
+           size = 2
+           ) +
+  geom_hline(yintercept = 10,
+*            col = "#e63946",
+             )
+```
+]
+ 
+.panel2-my_code12-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code12_non_seq_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Boxplot
+.panel1-my_code12-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region),
+           fill = "#457b9d",
+           color =  "#1d3557",
+           size = 2
+           ) +
+  geom_hline(yintercept = 10,
+             col = "#e63946",
+*            size = 2
+             )
+```
+]
+ 
+.panel2-my_code12-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code12_non_seq_06_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code12-non_seq {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code12-non_seq {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code12-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+
+count: false
+ 
+## Scatterplot
+.panel1-my_code13-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho),
+             )
+```
+]
+ 
+.panel2-my_code13-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code13_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Scatterplot
+.panel1-my_code13-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho),
+*              color = "darkgreen",
+             )
+```
+]
+ 
+.panel2-my_code13-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code13_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Scatterplot
+.panel1-my_code13-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho),
+               color = "darkgreen",
+*              size = 5,
+             )
+```
+]
+ 
+.panel2-my_code13-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code13_non_seq_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Scatterplot
+.panel1-my_code13-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho),
+               color = "darkgreen",
+               size = 5,
+*              shape = 18
+             )
+```
+]
+ 
+.panel2-my_code13-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code13_non_seq_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Scatterplot
+.panel1-my_code13-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho),
+               color = "darkgreen",
+*              alpha = 0.5,
+               size = 5,
+               shape = 18
+             )
+```
+]
+ 
+.panel2-my_code13-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code13_non_seq_05_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code13-non_seq {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code13-non_seq {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code13-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+---
+### alpha
+
+This parameter sets the transparency of your color 
+
+It is particularly useful in case of **overplotting** - there are too many observations on one graph and they overlap on one another. The overlap prevents the reader to distinguish the number of observations on a graph. Transparency helps to visualize them.
+
+* Darker color means that there are multiple observations on one another
+
+* Also good for showing two groups on a graph (old vs. new groups or predicted vs. fitted values).
+
+---
+### Colors in aes 
+
+Remember that we used color and fill inside the **aes** field to specify whether the observations on our graph should have been grouped according to a categorical variable. 
+
+In that case, changing colors works slightly differently...
+---
+
+count: false
+ 
+
+.panel1-my_code14-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho,
+                   color = as.character(trumpw)),
+                   size = 5,
+                   alpha = 0.8,
+             )
+```
+]
+ 
+.panel2-my_code14-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code14_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_code14-non_seq[
+
+```r
+election_turnout %&gt;%
+  ggplot() +
+  geom_point(mapping =
+               aes(x = perhsed,
+                   y = turnoutho,
+                   color = as.character(trumpw)),
+                   size = 5,
+                   alpha = 0.8,
+*                  color = "red"
+             )
+```
+]
+ 
+.panel2-my_code14-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_code14_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code14-non_seq {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code14-non_seq {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code14-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+class: inverse, middle, center
+#Scales
+
+---
+## Scales
+
+Scales in ggplot2 control the mapping from data to aesthetics. They take your data in **aes** and turn it into something that you can see.
+
+Remember in aes you can map:
+
+* position (x or y)
+* shape
+* size
+* color
+* line
+
+As long as you have mapped a variable to an aesthetic with aes(), you can use the scale_*() functions to deal with it.
+
+We already used some scales in previous slides to modify the position argument in aes:
+
+* scale_y_continuous
+* scale_x_continuous
+* scale_y_discrete
+* scale_x_discrete
+
+---
+
+Here are some scales that you can use to change color when color or fill are set up within the aes command. 
+
+**Change aes arguments**
+* scale_fill_manual
+* scale_color_manual
+* scale_shape_manual
+* scale_size_continuous
+* scale_alpha_manual
+
+**Use of palettes**
+* scale_fill_PALETTENAMES
+* scale_color_PALETTENAMES
+
+**Reverse your scale**
+* scale_x_reverse
+* scale_y_reverse
+
+More scales can be found [here](https://ggplot2.tidyverse.org/reference/index.html#section-scales)
+
+---
+### Examples
+
+
+```r
+plot_2 = 
+election_turnout %&gt;%
+  ggplot() + 
+  geom_point(mapping =  
+               aes(x = perhsed, 
+                   y = turnoutho, 
+*                  color = as.character(trumpw)),
+                   size = 5, 
+                   alpha = 0.8) +
+* scale_color_manual(values = c("#9e2a2b", "#b1a7a6"))
+```
+
+---
+
+```r
+plot_2
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Example2
+
+
+```r
+plot_3 = 
+election_turnout %&gt;%
+  ggplot() + 
+  geom_bar(mapping = 
+             aes(x = region, 
+*                fill = as.character(trumpw))) +
+* scale_fill_manual(values = c("#9a031e", "#fb8b24"))
+```
+
+---
+
+```r
+plot_3
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Example 3
+
+
+```r
+plot_4 = 
+election_turnout %&gt;%
+  ggplot() + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+*                  shape = as.character(trumpw),
+*                  color = as.character(trumpw)),
+                   size = 4, 
+                   alpha = 0.8) +
+* scale_shape_manual(values = c(15, 16)) +
+* scale_color_manual(values = c("#335c67", "#9e2a2b"))
+```
+
+---
+
+```r
+plot_4
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## palettes
+
+
+```r
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + 
+* scale_fill_brewer()
+```
+
+![](Data-Vis-Slides_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+
+---
+
+```r
+ggplot(data = election_turnout) + 
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + 
+* scale_fill_brewer(palette = "Spectral")
+```
+
+![](Data-Vis-Slides_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+
+---
+
+```r
+ggplot(data = election_turnout) + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   color = as.character(trumpw)), size = 5, alpha = 0.8) +
+* scale_color_paletteer_d("nord::aurora")
+```
+
+![](Data-Vis-Slides_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+---
+class: inverse, middle, center
+#Themes
+
+---
+## Themes
+
+You can change the overall appearance of your graph, such as a background, borders and so on.
+
+There are [8 themes built into ggplot2](https://ggplot2.tidyverse.org/reference/ggtheme.html) that you can use to make your graph a better fit for your report.
+
+* theme_grey
+* theme_gray
+* theme_bw
+* theme_linedraw
+* theme_light
+* theme_dark
+* theme_minimal
+* theme_classic
+* theme_void
+* theme_test
+
+---
+## Themes
+
+Let's see this in practice 
+
+
+
+---
+count: false
+ 
+
+.panel1-my_code16-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+    geom_hline(yintercept = 10, col = "#e63946") +
+    scale_fill_paletteer_d("nord::aurora") +
+    labs(title = "Number of states by region",
+    subtitle = "Regions are further broken down by whether Trump won") +
+    ylab("Number of states") +
+    xlab("Regions") +
+*   theme_grey()
+```
+]
+ 
+.panel2-my_code16-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code16_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_code16-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+    geom_hline(yintercept = 10, col = "#e63946") +
+    scale_fill_paletteer_d("nord::aurora") +
+    labs(title = "Number of states by region",
+    subtitle = "Regions are further broken down by whether Trump won") +
+    ylab("Number of states") +
+    xlab("Regions") +
+*   theme_classic()
+```
+]
+ 
+.panel2-my_code16-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code16_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_code16-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+    geom_hline(yintercept = 10, col = "#e63946") +
+    scale_fill_paletteer_d("nord::aurora") +
+    labs(title = "Number of states by region",
+    subtitle = "Regions are further broken down by whether Trump won") +
+    ylab("Number of states") +
+    xlab("Regions") +
+*   theme_dark()
+```
+]
+ 
+.panel2-my_code16-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code16_rotate_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_code16-rotate[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+    geom_hline(yintercept = 10, col = "#e63946") +
+    scale_fill_paletteer_d("nord::aurora") +
+    labs(title = "Number of states by region",
+    subtitle = "Regions are further broken down by whether Trump won") +
+    ylab("Number of states") +
+    xlab("Regions") +
+*   theme_void()
+```
+]
+ 
+.panel2-my_code16-rotate[
+![](Data-Vis-Slides_files/figure-html/my_code16_rotate_04_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_code16-rotate {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_code16-rotate {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_code16-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+---
+### Customized themes - arguments
+
+You can also customized your theme. There are [multiple arguments within the function **theme()**](https://ggplot2.tidyverse.org/reference/theme.html) that you can modify.
+Here is a partial list:
+
+**Axes** (for all axis elements, you can always specify .y or .x)
+* axis.title - *axis labels*
+* axis.text  - *axis ticks' labels*
+* axis.ticks - *tick marks along axes*
+* axis.line  - *line along axed*
+    
+**Legend**
+* legend.background - *background of the legend*
+* legend.margin - *margin around the legend*
+* legend.text - *legend item lables*
+* legend.title - *legend title*
+* legend.position - *legend position*
+
+---
+### Customized themes - arguments
+
+**Panel**
+* panel.background
+* panel.border
+* panel.grid
+
+**Plot**
+* plot.background
+* plot.title
+* plot.subtitle
+* plot.caption
+
+---
+### Customized themes - elements
+
+To modify these elements there are [4 common elements to use](https://ggplot2.tidyverse.org/reference/element.html ) that can be applied to a graph. 
+
+* **element_text()** to modify the text of the plot.title, plot.subtitle, and plot.caption, axis.title.x(.y) or axis.text.x(.y)
+  * family = "Times New Roman", *specify the font to be used*
+  
+  * face = "bold", face = "italic"...*specify the face of the text*
+  
+  * color = "red", *specify the color*
+  
+  * size = 14, *specify the size of the font*
+  
+  * hjust =10, vjust = 10, *set the horizontal and vertical position in the graph*
+  
+  * angle = 30, *specify the angle of the text*
+
+---
+### Customized themes - elements
+
+* **element_line()** to modify components as axis lines, major and minor grid lines
+  * color
+  * size
+  * linetype 
+
+* **element_rect(**) to modify rectangle components such as plot, panel, or legend background
+  * fill
+  * color
+  * size
+  * linetype
+
+* **element_blank()** to remove an element from the graph's theme
+  * examples: axis.ticks = element_blank()
+
+---
+
+```r
+full_plot = ggplot(data = election_turnout) + 
+
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) + # aes settings
+
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) + #scales to change aes settings - fill
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) + #scales to change aes settings - position
+  
+  labs(title = "Number of states by region", #title
+  subtitle = "Regions are further broken down by whether Trump won") + #subtitle
+  
+  ylab("Number of states") + #y lables 
+  xlab("Regions") +  #x labels
+  
+  theme_classic() + #theme
+  theme(
+  plot.title = element_text(face = "bold", size = 16), #change plot title format
+  plot.subtitle = element_text(face = "italic", size = 14), #change subtitle format
+  
+  axis.title = element_text(size = 14, face = "bold"), #axis title
+  axis.text = element_text(size = 12, face = "bold"),  #axis lables
+  axis.line = element_blank(), #remove the axis line
+  axis.ticks = element_blank(), #remove the axis ticks
+  
+  legend.title = element_text(size = 12, face = "bold", color = "white"), #change legend title
+  legend.text = element_text(size = 12, face = "bold", color = "white"), #change legend text
+  legend.background = element_rect(fill = "#335c67")) + #change background
+  
+  guides(fill = guide_legend("Trump won", nrow = 2)) #change the legend
+```
+
+
+---
+
+
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+* plot.subtitle = element_text(face = "italic", size = 14),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+* axis.title = element_text(size = 14, face = "bold"),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  axis.title = element_text(size = 14, face = "bold"),
+* axis.text = element_text(size = 12, face = "bold"),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"),
+* axis.line = element_blank(),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"),
+  axis.line = element_blank(),
+* axis.ticks = element_blank(),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_06_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+* legend.title = element_text(size = 12, face = "bold", color = "white"),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_07_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  legend.title = element_text(size = 12, face = "bold", color = "white"),
+* legend.text = element_text(size = 12, face = "bold", color = "white"),
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_08_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_fullcode-non_seq[
+
+```r
+ggplot(data = election_turnout) +
+  geom_bar(mapping = aes(x = region, fill = as.character(trumpw))) +
+  scale_fill_manual(values = c("#e09f3e", "#540b0e")) +
+  scale_y_continuous(breaks = seq(0, 20, by = 2)) +
+  labs(title = "Number of states by region",
+  subtitle = "Regions are further broken down by whether Trump won") +
+  ylab("Number of states") +
+  xlab("Regions") +
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  legend.title = element_text(size = 12, face = "bold", color = "white"),
+  legend.text = element_text(size = 12, face = "bold", color = "white"),
+* legend.background = element_rect(fill = "#335c67")
+  ) + guides(fill = guide_legend("Trump won", nrow = 2))
+```
+]
+ 
+.panel2-my_fullcode-non_seq[
+![](Data-Vis-Slides_files/figure-html/my_fullcode_non_seq_09_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_fullcode-non_seq {
+  color: black;
+  width: 53.9%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_fullcode-non_seq {
+  color: black;
+  width: 44.1%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_fullcode-non_seq {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+---
+
+```r
+full_plot
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Saving your theme
+
+This is especially helpful if you are writing a report or a full document.
+
+
+```r
+my_new_theme &lt;- 
+  theme_classic() +
+  theme(
+  plot.title = element_text(face = "bold", size = 16),
+  plot.subtitle = element_text(face = "italic", size = 14),
+  
+  axis.title = element_text(size = 14, face = "bold"),
+  axis.text = element_text(size = 12, face = "bold"), 
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  
+  legend.title = element_text(size = 12, face = "bold", color = "white"), 
+  legend.text = element_text(size = 12, face = "bold", color = "white"), 
+  legend.background = element_rect(fill = "#335c67"))
+```
+
+---
+## Applying your theme
+
+```r
+plot_1 = 
+election_turnout %&gt;%
+  ggplot() + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   color = as.character(trumpw)), 
+                   size = 5, 
+                   alpha = 0.8) +
+  scale_color_manual(values = c("#e09f3e", "#540b0e")) +
+
+  labs(title = "Relationship between turnout and education",
+  subtitle = "% turnout and % high school education") +
+  
+  ylab("Voter turnout") +
+  xlab("% residents with high school education") + 
+  
+* my_new_theme
+```
+
+---
+
+```r
+plot_1
+```
+
+&lt;img src="Data-Vis-Slides_files/figure-html/unnamed-chunk-34-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+#### Additional themes
+
+There are several packages with customized themes that you can use inspired by newspapers, other software, TV series...
+
+ggthemes - https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/ 
+hrbrthemes - https://github.com/hrbrmstr/hrbrthemes 
+ggpomological (an older feeling...) - https://www.garrickadenbuie.com/project/ggpomological/
+ggtech (inspired by tech companies) - https://github.com/ricardo-bion/ggtech 
+
+To use them:
+
+
+```r
+install.packages("ggthemes")
+library("ggthemes")
+
+election_turnout %&gt;%
+  ggplot() + 
+  geom_point(mapping = aes(x = perhsed, y = turnoutho, 
+                   shape = as.character(trumpw), 
+                   size = 4, 
+                   alpha = 0.8) +
+  scale_shape_manual(values = c(15, 16)) + 
+* theme_stata()
+```
+
+---
+# Save your plot
+
+To save your plot, you can use **ggsave** as shown here.
+
+
+```r
+ggsave(filename = "my_first_plot.png",  # you can also use .pdf
+        plot = plot_1)
+
+ggsave(filename = "my_first_plot.png",
+       plot = plot_1,
+       width = 10,
+       height = 10,
+       units = "in")
+```
+
+---
+## Saving your plot
+
+Here are some general guidelines:
+
+**.JPEG (maintains colors)**
+* Lots of colors (like a photograph)
+* Images on the Internet
+* Billboard size 
+
+**.PNG (compress a few colors)**
+* Few colors
+* Not a photograph
+* To be used in Word or other document
+
+**.PDF or .SVG**
+* Plan to use in Adobe 
+* Plan to use in multiple sizes 
+
+
+---
+Other examples
+
+---
+
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+*cars
+```
+]
+ 
+.panel2-my_cars-auto[
+
+```
+   speed dist
+1      4    2
+2      4   10
+3      7    4
+4      7   22
+5      8   16
+6      9   10
+7     10   18
+8     10   26
+9     10   34
+10    11   17
+11    11   28
+12    12   14
+13    12   20
+14    12   24
+15    12   28
+16    13   26
+17    13   34
+18    13   34
+19    13   46
+20    14   26
+21    14   36
+22    14   60
+23    14   80
+24    15   20
+25    15   26
+26    15   54
+27    16   32
+28    16   40
+29    17   32
+30    17   40
+31    17   50
+32    18   42
+33    18   56
+34    18   76
+35    18   84
+36    19   36
+37    19   46
+38    19   68
+39    20   32
+40    20   48
+41    20   52
+42    20   56
+43    20   64
+44    22   66
+45    23   54
+46    24   70
+47    24   92
+48    24   93
+49    24  120
+50    25   85
+```
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+cars %&gt;%
+* filter(speed &gt; 4)
+```
+]
+ 
+.panel2-my_cars-auto[
+
+```
+   speed dist
+1      7    4
+2      7   22
+3      8   16
+4      9   10
+5     10   18
+6     10   26
+7     10   34
+8     11   17
+9     11   28
+10    12   14
+11    12   20
+12    12   24
+13    12   28
+14    13   26
+15    13   34
+16    13   34
+17    13   46
+18    14   26
+19    14   36
+20    14   60
+21    14   80
+22    15   20
+23    15   26
+24    15   54
+25    16   32
+26    16   40
+27    17   32
+28    17   40
+29    17   50
+30    18   42
+31    18   56
+32    18   76
+33    18   84
+34    19   36
+35    19   46
+36    19   68
+37    20   32
+38    20   48
+39    20   52
+40    20   56
+41    20   64
+42    22   66
+43    23   54
+44    24   70
+45    24   92
+46    24   93
+47    24  120
+48    25   85
+```
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+cars %&gt;%
+  filter(speed &gt; 4) %&gt;%
+* ggplot()
+```
+]
+ 
+.panel2-my_cars-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars_auto_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+cars %&gt;%
+  filter(speed &gt; 4) %&gt;%
+  ggplot() +
+* aes(x = speed)
+```
+]
+ 
+.panel2-my_cars-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars_auto_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+cars %&gt;%
+  filter(speed &gt; 4) %&gt;%
+  ggplot() +
+  aes(x = speed) +
+* aes(y = dist)
+```
+]
+ 
+.panel2-my_cars-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars_auto_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+cars %&gt;%
+  filter(speed &gt; 4) %&gt;%
+  ggplot() +
+  aes(x = speed) +
+  aes(y = dist) +
+* geom_point(
+*   alpha = .8,
+*   color = "blue"
+*   )
+```
+]
+ 
+.panel2-my_cars-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars_auto_06_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars-auto[
+
+```r
+cars %&gt;%
+  filter(speed &gt; 4) %&gt;%
+  ggplot() +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(
+    alpha = .8,
+    color = "blue"
+    ) +
+* aes(size = speed)
+```
+]
+ 
+.panel2-my_cars-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars_auto_07_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_cars-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_cars-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_cars-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+
+count: false
+ 
+## Changing the Filter
+.panel1-my_cars2-rotate[
+
+```r
+cars %&gt;%
+* filter(speed &gt; 4) %&gt;%
+  ggplot() +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(
+    alpha = .8,
+    color = "blue"
+    ) +
+  aes(size = speed)
+```
+]
+ 
+.panel2-my_cars2-rotate[
+![](Data-Vis-Slides_files/figure-html/my_cars2_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+## Changing the Filter
+.panel1-my_cars2-rotate[
+
+```r
+cars %&gt;%
+* filter(speed &gt; 20) %&gt;%
+  ggplot() +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(
+    alpha = .8,
+    color = "blue"
+    ) +
+  aes(size = speed)
+```
+]
+ 
+.panel2-my_cars2-rotate[
+![](Data-Vis-Slides_files/figure-html/my_cars2_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_cars2-rotate {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_cars2-rotate {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_cars2-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+---
+
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+*ggplot(data = cars)
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+* theme_minimal(base_size = 13)
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+* aes(x = speed)
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_03_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+* aes(y = dist)
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_04_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+* geom_point(size = 8,
+*            shape = 21,
+*            alpha = .9,
+*            color = "green")
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_05_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+* aes(fill = speed)
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_06_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+* scale_fill_viridis_c(option = "viridis")
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_07_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+  scale_fill_viridis_c(option = "viridis") +
+* labs(title = "Cars")
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_08_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+  scale_fill_viridis_c(option = "viridis") +
+  labs(title = "Cars") +
+* xlab("Speed (mph)")
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_09_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+Changing Scale fill
+.panel1-my_cars3-auto[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+  scale_fill_viridis_c(option = "viridis") +
+  labs(title = "Cars") +
+  xlab("Speed (mph)") +
+* theme(legend.position = "none")
+```
+]
+ 
+.panel2-my_cars3-auto[
+![](Data-Vis-Slides_files/figure-html/my_cars3_auto_10_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_cars3-auto {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_cars3-auto {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_cars3-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+count: false
+ 
+
+.panel1-my_cars3-rotate[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+* scale_fill_viridis_c(option = "magma") +
+  labs(title = "Cars") +
+  xlab("Speed (mph)") +
+  theme(legend.position = "none")
+```
+]
+ 
+.panel2-my_cars3-rotate[
+![](Data-Vis-Slides_files/figure-html/my_cars3_rotate_01_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars3-rotate[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+* scale_fill_viridis_c(option = "cividis") +
+  labs(title = "Cars") +
+  xlab("Speed (mph)") +
+  theme(legend.position = "none")
+```
+]
+ 
+.panel2-my_cars3-rotate[
+![](Data-Vis-Slides_files/figure-html/my_cars3_rotate_02_output-1.png)&lt;!-- --&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-my_cars3-rotate[
+
+```r
+ggplot(data = cars) +
+  theme_minimal(base_size = 13) +
+  aes(x = speed) +
+  aes(y = dist) +
+  geom_point(size = 8,
+             shape = 21,
+             alpha = .9,
+             color = "green") +
+  aes(fill = speed) +
+* scale_fill_viridis_c(option = "plasma") +
+  labs(title = "Cars") +
+  xlab("Speed (mph)") +
+  theme(legend.position = "none")
+```
+]
+ 
+.panel2-my_cars3-rotate[
+![](Data-Vis-Slides_files/figure-html/my_cars3_rotate_03_output-1.png)&lt;!-- --&gt;
+]
+
+&lt;style&gt;
+.panel1-my_cars3-rotate {
+  color: black;
+  width: 38.6060606060606%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-my_cars3-rotate {
+  color: black;
+  width: 59.3939393939394%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-my_cars3-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:10",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
